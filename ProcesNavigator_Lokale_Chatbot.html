@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>ProcesNavigator | Lokale deterministische procesassistent</title>
+<style>
+:root{--bg:#0b1017;--side:#0e1620;--panel:#121e2b;--panel2:#162433;--panel3:#1b2b3b;--line:#2a3b4c;--ink:#edf5f9;--muted:#96acbb;--dim:#657b8d;--accent:#4fdec1;--blue:#7db9f1;--amber:#f2bb6b;--bad:#f5a69f;--radius:12px}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 system-ui,-apple-system,"Segoe UI",Arial,sans-serif}button,input,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{display:grid;grid-template-columns:282px minmax(420px,1fr) 254px;height:100dvh;min-height:590px}.left,.right{background:var(--side);min-height:0;overflow:auto}.left{border-right:1px solid var(--line)}.right{border-left:1px solid var(--line)}.brand{padding:24px 19px 20px;border-bottom:1px solid var(--line)}.mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(140deg,#48c8aa,#4b92c0);display:grid;place-items:center;color:#07151c;font-size:21px;font-weight:800}.brand-line{display:flex;align-items:center;gap:11px}.brand h1{font-size:15px;line-height:1.3;margin:0;font-weight:760;letter-spacing:.15px}.eyebrow{color:var(--muted);text-transform:uppercase;letter-spacing:1.4px;font-size:10px;font-weight:700}.brand-sub{font-size:11px;color:var(--muted);margin:11px 0 0}.side-block{padding:20px 17px;border-bottom:1px solid var(--line)}.side-heading{font-size:11px;letter-spacing:1.1px;font-weight:730;color:var(--muted);text-transform:uppercase;margin:0 0 12px}.filebox{border:1px dashed #527587;border-radius:12px;padding:15px;background:rgba(70,175,174,.035);text-align:center;transition:all .15s}.filebox.drag{border-color:var(--accent);background:rgba(79,222,193,.13)}.filebox .icon{font-size:24px;opacity:.9}.filebox p{font-size:12px;color:var(--muted);margin:4px 0 12px}.btn{border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--ink);padding:9px 12px;font-size:12px;font-weight:650;transition:background .12s}.btn:hover{background:var(--panel3)}.btn.primary{color:#06191c;background:var(--accent);border-color:var(--accent)}.btn.primary:hover{background:#92f1dd}.btn.ghost{background:transparent}.btn.wide{width:100%}.file-name{font-size:12px;font-weight:650;overflow-wrap:anywhere;line-height:1.5}.file-meta{font-size:11px;color:var(--muted);margin-top:7px}.status{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:12px}.dot{width:7px;height:7px;border-radius:50%;background:var(--dim);flex:none}.dot.good{background:var(--accent)}.dot.warn{background:var(--amber)}.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.stat{border:1px solid var(--line);border-radius:9px;padding:9px;background:#111d29}.stat strong{font-size:19px;font-variant-numeric:tabular-nums;display:block;line-height:1.1}.stat small{color:var(--muted);font-size:10px}.side-btns{display:grid;gap:7px}.sheetlist{display:flex;flex-direction:column;gap:3px;max-height:240px;overflow:auto}.sheet{display:flex;justify-content:space-between;gap:6px;text-align:left;color:var(--muted);background:transparent;border:0;padding:5px;border-radius:5px;font-size:11px}.sheet:hover{background:#1c2b3a;color:var(--ink)}.sheet .count{white-space:nowrap;color:var(--dim)}
+.main{display:flex;flex-direction:column;min-height:0;background:radial-gradient(circle at 48% -15%,#192a32 0,transparent 45%),var(--bg)}.top{height:65px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 26px;gap:12px;background:rgba(12,20,29,.76)}.top-title{font-size:14px;font-weight:760}.top-sub{font-size:11px;color:var(--muted)}.top-right{display:flex;align-items:center;gap:8px}.pill{font-size:10px;border:1px solid #335e57;background:#132821;border-radius:50px;color:#8de5d0;padding:3px 9px;letter-spacing:.35px;font-weight:750}.pill.neutral{color:var(--muted);border-color:var(--line);background:transparent}.chat-scroll{overflow:auto;flex:1;min-height:0;scroll-behavior:smooth}.chat-inner{max-width:930px;margin:auto;padding:30px 25px 36px}.welcome{padding:38px 8px 42px}.welcome h2{font-size:clamp(27px,3vw,36px);line-height:1.15;letter-spacing:-.85px;margin:18px 0 12px}.welcome p{color:var(--muted);max-width:600px;font-size:14px}.welcome .hint{margin-top:22px}.feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:20px}.feature{border:1px solid var(--line);background:rgba(17,29,41,.8);padding:13px;border-radius:11px;text-align:left;color:var(--ink)}.feature:hover{border-color:#447f78;background:#192c37}.feature span{color:var(--accent);font-weight:800;display:block;margin-bottom:4px}.feature small{color:var(--muted);font-size:11px}.rowmsg{display:flex;gap:12px;align-items:flex-start;margin:20px 0}.rowmsg.user{justify-content:flex-end}.avatar{width:31px;height:31px;background:#254338;color:#8eeed1;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:12px;flex:none}.rowmsg.user .avatar{order:2;background:#223950;color:#aad3ff}.bubble{min-width:0;max-width:calc(100% - 50px)}.rowmsg.user .bubble{max-width:83%;background:#1a3043;border:1px solid #2c4f66;border-radius:14px 4px 14px 14px;padding:11px 15px;white-space:pre-wrap}.answer{background:#101c27;border:1px solid var(--line);border-radius:5px 14px 14px 14px;padding:17px 19px;min-width:270px}.answer h3{font-size:15px;margin:0 0 9px;color:var(--ink)}.answer h4{font-size:12px;margin:16px 0 7px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}.answer p{margin:9px 0;color:#d7e3eb}.answer p.muted,.muted{color:var(--muted)!important}.answer .note{font-size:11px;color:var(--muted)}.answer .soft-alert{border-left:3px solid var(--amber);background:rgba(242,187,107,.06);padding:9px 11px;font-size:12px;margin:10px 0}.result-list{margin:10px 0;display:flex;flex-direction:column;gap:7px}.result-item{background:#142331;border:1px solid #253e4c;border-radius:9px;padding:11px 12px}.result-item .headline{color:#fff;font-size:13px;font-weight:680;line-height:1.35}.result-item p{margin:5px 0 0;font-size:12px;color:#bdcfda;white-space:pre-wrap}.result-item .meta{font-size:11px;color:var(--muted);margin-top:6px}.kv{display:grid;grid-template-columns:minmax(125px,35%) 1fr;gap:5px 10px;font-size:12px;margin:9px 0}.kv dt{color:var(--muted)}.kv dd{margin:0;overflow-wrap:anywhere}.tags{display:flex;gap:5px;flex-wrap:wrap}.tag{font-size:10px;border:1px solid #365364;color:#bdd7e3;border-radius:5px;padding:2px 6px;max-width:100%;overflow-wrap:anywhere}.tag.warning{color:#efc58e;border-color:#766047}.tag.green{color:#9ee9d7;border-color:#3f7167}.table-scroll{max-width:100%;overflow:auto;margin:10px 0}.data-table{border-collapse:collapse;width:100%;font-size:11px}.data-table th,.data-table td{padding:8px 8px;border-bottom:1px solid #2a3d4c;text-align:left;vertical-align:top;min-width:85px}.data-table th{color:var(--muted);background:#172634;white-space:nowrap}.data-table tr:hover td{background:#162a37}.mini-chart{display:flex;flex-direction:column;gap:7px;margin-top:8px}.barrow{display:grid;grid-template-columns:minmax(90px,1fr) minmax(80px,2fr) 42px;align-items:center;gap:9px;font-size:11px}.barrow span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.bar-bg{height:9px;background:#1f3542;border-radius:4px;overflow:hidden}.bar-fg{height:100%;background:#55bda8;border-radius:4px}.barrow b{text-align:right;font-weight:650}.sources{border-top:1px solid #294050;margin-top:13px;padding-top:10px;display:flex;gap:6px;flex-wrap:wrap}.source{color:#b9d1de;background:#1b3040;padding:3px 7px;border-radius:5px;font-size:10px}.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.chip{border:1px solid #31534f;border-radius:8px;padding:6px 9px;color:#9be5d5;background:rgba(44,91,81,.12);font-size:11px}.chip:hover{background:rgba(44,91,81,.34)}.ellipsis{font-size:11px;color:var(--muted);margin:7px 0}.loading-track{height:6px;background:#203440;border-radius:5px;overflow:hidden;margin-top:9px}.loading-track>div{height:100%;background:var(--accent);width:0%;transition:width .2s}.composer-wrap{border-top:1px solid var(--line);padding:15px 25px 17px;background:#0d1721}.composer{max-width:930px;margin:auto}.inputrow{display:flex;gap:9px;align-items:flex-end;border:1px solid #32505f;border-radius:12px;padding:9px;background:#142331}.inputrow:focus-within{border-color:#57a996}.question{width:100%;border:0;background:transparent;color:var(--ink);resize:none;outline:none;min-height:47px;max-height:160px;line-height:1.5;font-size:13px}.question::placeholder{color:#7794a5}.send{height:39px;padding:0 15px;min-width:75px}.composer-help{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;color:var(--dim);font-size:10px}.contextline{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.section-title{font-size:11px;font-weight:750;color:var(--muted);letter-spacing:1px;text-transform:uppercase}.right section{padding:21px 17px;border-bottom:1px solid var(--line)}.context-card{border:1px solid var(--line);background:#111d29;border-radius:10px;padding:12px;margin-top:12px}.context-card strong{font-size:12px}.context-card p{font-size:11px;color:var(--muted);margin:5px 0 0;overflow-wrap:anywhere}.ctx-field{margin:10px 0}.ctx-field small{display:block;color:var(--dim);font-size:10px;text-transform:uppercase}.ctx-field span{display:block;font-size:12px;overflow-wrap:anywhere}.right-note{font-size:11px;line-height:1.6;color:var(--muted);margin:10px 0 0}.empty{color:var(--dim);font-size:12px}.overlay{position:fixed;inset:0;background:rgba(2,8,12,.75);display:none;align-items:center;justify-content:center;padding:18px;z-index:30}.overlay.show{display:flex}.modal{max-width:850px;width:100%;max-height:85vh;overflow:auto;border:1px solid #496170;background:#112130;border-radius:15px;padding:25px;box-shadow:0 35px 80px #0007}.modal h2{margin:0 0 6px;font-size:20px}.modal-header{display:flex;justify-content:space-between;align-items:start;gap:20px}.modal .modal-body{margin-top:18px}.modal .input{background:#0c1721;border:1px solid var(--line);color:var(--ink);border-radius:7px;padding:8px;max-width:100%}.modal .small{font-size:12px;color:var(--muted)}.modal pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;background:#0a1620;padding:14px;border-radius:8px}.hide{display:none!important}
+@media (max-width:1180px){.app{grid-template-columns:240px minmax(390px,1fr)}.right{display:none}.top{padding:0 20px}}
+@media (max-width:750px){.app{display:flex;flex-direction:column}.left{height:auto;overflow:visible;border-right:0;border-bottom:1px solid var(--line);flex:none}.left .brand{padding:9px 15px}.brand-sub,.left .side-block:not(:first-of-type){display:none}.left .side-block{border:0;padding:8px 15px}.left .filebox{display:flex;align-items:center;gap:10px;padding:5px 10px;text-align:left}.left .filebox p,.left .filebox .icon{display:none}.left .filebox .btn{flex:none}.main{flex:1;min-height:0}.top{height:54px;padding:0 15px}.top-right .pill.neutral{display:none}.chat-inner{padding:12px}.welcome{padding:25px 4px}.welcome h2{font-size:27px}.feature-grid{grid-template-columns:1fr}.answer{padding:12px;min-width:0}.composer-wrap{padding:9px 10px}.rowmsg{gap:7px}.avatar{width:25px;height:25px;font-size:10px}}
+</style>
+</head>
+<body>
+<div class="app">
+ <aside class="left">
+  <div class="brand"><div class="brand-line"><div class="mark">⌘</div><div><div class="eyebrow">Lokale procesintelligentie</div><h1>ProcesNavigator</h1></div></div><p class="brand-sub">Deterministisch. Brongebonden. 100% lokaal.</p></div>
+  <div class="side-block"><div class="side-heading">Bronbestand</div><div id="drop" class="filebox"><div class="icon">▣</div><div class="file-name" id="fileLabel">Nog geen Excelbestand</div><p>Sleep hier een XLS, XLSX, CSV of TSV-bestand naartoe.</p><button class="btn primary wide" id="loadBtn">Excelbestand laden</button></div><input type="file" id="fileInput" accept=".xlsx,.xls,.xlsm,.csv,.tsv" hidden><div class="file-meta" id="loadDetail">Bestand blijft op jouw apparaat.</div><div class="loading-track hide" id="progress"><div id="progressBar"></div></div></div>
+  <div class="side-block"><div class="side-heading">Datamodel</div><div class="status"><span class="dot" id="stateDot"></span><span id="stateText">Geen gegevens geladen</span></div><div class="stat-grid"><div class="stat"><strong id="kSheets">0</strong><small>Tabbladen</small></div><div class="stat"><strong id="kRows">0</strong><small>Gegevensregels</small></div><div class="stat"><strong id="kProcesses">0</strong><small>Processen</small></div><div class="stat"><strong id="kLinks">0</strong><small>Relaties</small></div></div></div>
+  <div class="side-block"><div class="side-heading">Gereedschap</div><div class="side-btns"><button class="btn wide" id="overviewBtn" disabled>Datasetoverzicht</button><button class="btn wide" id="testBtn" disabled>Testset controleren</button><button class="btn wide" id="exploreBtn" disabled>Tabellen verkennen</button><button class="btn wide" id="resetBtn">Nieuwe conversatie</button><button class="btn wide" id="exportBtn">Gesprek exporteren</button></div></div>
+  <div class="side-block"><div class="side-heading">Geïmporteerde tabbladen</div><div class="sheetlist" id="sheetList"><p class="empty">Nog niet geladen</p></div></div>
+ </aside>
+ <main class="main">
+  <div class="top"><div><div class="top-title">Procesassistent</div><div class="top-sub" id="topSub">Brongebonden zoeken en redeneren</div></div><div class="top-right"><span class="pill neutral">GEEN AI</span><span class="pill">OFFLINE</span></div></div>
+  <div class="chat-scroll" id="chatScroll"><div class="chat-inner" id="chatInner"><div class="welcome" id="welcome"><div class="eyebrow">Kennis uit eigen brondata</div><h2>Van Excel naar<br>een navigeerbaar procesmodel.</h2><p>Laad een bestand. Stel vragen over processen, volgorde, besluiten, rollen, applicaties, assets en onderlinge verbanden. Stel daarna vervolgvragen zonder de context te herhalen.</p><div class="feature-grid" id="exampleGrid"><button class="feature" data-q="Welke processen staan in de dataset?"><span>01 &nbsp; Procesherkenning</span><small>Welke processen staan in de dataset?</small></button><button class="feature" data-q="Wat is de eerste activiteit van A01.1?"><span>02 &nbsp; Procesvolgorde</span><small>Wat is de eerste activiteit van A01.1?</small></button><button class="feature" data-q="Welke assets zijn aan activiteit 1 gekoppeld?"><span>03 &nbsp; Relaties</span><small>Welke assets horen bij activiteit 1?</small></button><button class="feature" data-q="Welke besluiten zijn nog te valideren?"><span>04 &nbsp; Controle</span><small>Welke beslisregels zijn nog te valideren?</small></button></div><p class="hint muted">Ondersteunt .xlsx, .xls, .xlsm, .csv en .tsv. Geen upload naar een server.</p></div></div></div>
+  <div class="composer-wrap"><div class="composer"><div class="inputrow"><textarea id="question" class="question" rows="2" placeholder="Stel een vraag over je procesgegevens..." aria-label="Vraag"></textarea><button id="sendBtn" class="btn primary send">Verstuur</button></div><div class="composer-help"><span id="composerContext" class="contextline">Context: nog geen proces gekozen</span><span>Enter versturen, Shift+Enter nieuwe regel</span></div></div></div>
+ </main>
+ <aside class="right"><section><div class="section-title">Actieve context</div><div class="context-card" id="contextPanel"><strong>Nog geen actieve context</strong><p>De chatbot onthoudt het proces, de activiteit en de filters uit je gesprek.</p></div></section><section><div class="section-title">Redeneerregels</div><p class="right-note">Processen en activiteit-ID’s blijven gekoppeld aan bronregels. Vervolgvragen gebruiken de bestaande context. Een beslisroute wordt alleen benoemd als deze expliciet in het Excelbestand staat.</p><div class="tags" style="margin-top:13px"><span class="tag green">Geen generatief model</span><span class="tag">Controleerbare regels</span><span class="tag">Bronverwijzingen</span><span class="tag">Lokale verwerking</span></div></section><section><div class="section-title">Vervolgvragen</div><div id="rightSuggestions" class="chips"></div></section></aside>
+</div>
+<div id="modalOverlay" class="overlay"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-header"><div><h2 id="modalTitle">Details</h2><p class="small" id="modalSub"></p></div><button class="btn" id="closeModal">Sluiten</button></div><div id="modalBody" class="modal-body"></div></div></div>
+<script>
+'use strict';
+/* Spreadsheet readers are embedded: no CDN, package loader, remote calls or eval. */
+const ExcelReader=(()=>{
+ const utf8=new TextDecoder('utf-8');
+ const latin=new TextDecoder('windows-1252');
+ const get16=(a,p)=>a[p]|(a[p+1]<<8);
+ const get32=(a,p)=>(a[p]|a[p+1]<<8|a[p+2]<<16|a[p+3]<<24)>>>0;
+ const decodeXML=s=>String(s).replace(/&(?:amp|lt|gt|quot|apos|#x[0-9a-f]+|#\d+);/gi,e=>{
+  const d={"&amp;":"&","&lt;":"<","&gt;":">","&quot;":"\"","&apos;":"'"};
+  if(d[e])return d[e]; if(e[1]==='#'){let n=e[2]==='x'?parseInt(e.slice(3,-1),16):parseInt(e.slice(2,-1),10);return Number.isFinite(n)?String.fromCodePoint(n):e} return e;
+ });
+ const colNum=s=>{let n=0;for(const c of s.toUpperCase())n=n*26+c.charCodeAt(0)-64;return n-1};
+ const sheetRef=(s)=>{let m=/([A-Z]+)(\d+)/i.exec(s);return m?{col:colNum(m[1]),row:Number(m[2])-1}:null};
+ function inflateRaw(data,size){
+  let input=data,ip=0,bits=0,nb=0;
+  let output=new Uint8Array(Math.max(1024,size||input.length*4));let op=0;
+  function ensure(n){while(nb<n){bits|=(input[ip++]||0)<<nb;nb+=8}}
+  function read(n){if(!n)return 0;ensure(n);let v=bits&((1<<n)-1);bits>>>=n;nb-=n;return v}
+  function addByte(v){if(op>=output.length){let next=new Uint8Array(output.length*2);next.set(output);output=next}output[op++]=v}
+  function copy(dist,len){if(!dist||dist>op)throw Error('ZIP: ongeldige terugverwijzing');for(let i=0;i<len;i++)addByte(output[op-dist])}
+  function huffman(lengths){let max=Math.max(...lengths,1),count=new Uint16Array(max+1),next=new Uint16Array(max+1);
+   for(let l of lengths)if(l)count[l]++;
+   let code=0;for(let i=1;i<=max;i++){code=(code+(count[i-1]||0))<<1;next[i]=code}
+   let n=1<<max,sym=new Int16Array(n),width=new Uint8Array(n);
+   for(let i=0;i<lengths.length;i++){let l=lengths[i];if(!l)continue;let c=next[l]++,rev=0;for(let j=0;j<l;j++){rev=(rev<<1)|(c&1);c>>>=1}let step=1<<l;for(let k=rev;k<n;k+=step){sym[k]=i;width[k]=l}}
+   return {max,mask:n-1,sym,width};
+  }
+  function symbol(table){ensure(table.max);let k=bits&table.mask,n=table.width[k];if(!n)throw Error('ZIP: ongeldig Huffman-symbool');bits>>>=n;nb-=n;return table.sym[k]}
+  const lenBase=[3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258];
+  const lenExtra=[0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0];
+  const distBase=[1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577];
+  const distExtra=[0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13];
+  let final=0;
+  do{
+   final=read(1);let type=read(2);
+   if(type===0){let drop=nb%8;read(drop);let length=read(16),check=read(16);if(((length^0xffff)&65535)!==check)throw Error('ZIP: opgeslagen blok beschadigd');for(let i=0;i<length;i++)addByte(read(8));continue}
+   let lt,dt;
+   if(type===1){lt=huffman(Array.from({length:288},(_,i)=>i<=143?8:i<=255?9:i<=279?7:8));dt=huffman(Array(32).fill(5))}
+   else if(type===2){let nl=read(5)+257,nd=read(5)+1,nc=read(4)+4,order=[16,17,18,0,8,7,9,6,10,5,11,4,10,5];
+    order=[16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15];let tmp=Array(19).fill(0);for(let i=0;i<nc;i++)tmp[order[i]]=read(3);
+    let ct=huffman(tmp),all=[];while(all.length<nl+nd){let s=symbol(ct);if(s<16)all.push(s);else if(s===16){if(!all.length)throw Error('ZIP: ongeldige RLE');let repeat=read(2)+3;while(repeat--)all.push(all[all.length-1])}else{let repeat=s===17?read(3)+3:read(7)+11;while(repeat--)all.push(0)}}
+    lt=huffman(all.slice(0,nl));dt=huffman(all.slice(nl,nl+nd));
+   }else throw Error('ZIP: compressiemethode niet ondersteund');
+   while(true){let x=symbol(lt);if(x<256){addByte(x);continue}if(x===256)break;let index=x-257;if(index<0||index>=lenBase.length)throw Error('ZIP: ongeldige lengte');let length=lenBase[index]+read(lenExtra[index]),di=symbol(dt);if(di>=distBase.length)throw Error('ZIP: ongeldige afstand');let distance=distBase[di]+read(distExtra[di]);copy(distance,length)}
+  }while(!final);
+  return output.slice(0,op);
+ }
+ async function decompress(data,size,method){if(method===0)return data;if(method!==8)throw Error('ZIP-methode '+method+' wordt niet ondersteund');
+  if(typeof DecompressionStream!=='undefined'){try{const stream=new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'));return new Uint8Array(await new Response(stream).arrayBuffer())}catch(_){/* offline ingebouwde fallback */}}
+  return inflateRaw(data,size);
+ }
+ class Zip{
+  constructor(buffer){this.buf=new Uint8Array(buffer);this.entries=new Map();let a=this.buf,pos=-1;for(let p=a.length-22;p>=Math.max(0,a.length-65558);p--)if(get32(a,p)===0x06054b50){pos=p;break}if(pos<0)throw Error('Geen geldig XLSX ZIP-bestand');let cnt=get16(a,pos+10),offset=get32(a,pos+16),p=offset;
+   for(let i=0;i<cnt;i++){if(get32(a,p)!==0x02014b50)throw Error('Ongeldige ZIP-index');let method=get16(a,p+10),comp=get32(a,p+20),raw=get32(a,p+24),nl=get16(a,p+28),extra=get16(a,p+30),comment=get16(a,p+32),at=get32(a,p+42);let name=utf8.decode(a.slice(p+46,p+46+nl));this.entries.set(name,{method,comp,raw,at});p+=46+nl+extra+comment}
+  }
+  async bytes(path){let e=this.entries.get(path);if(!e)return null;let a=this.buf,p=e.at;if(get32(a,p)!==0x04034b50)throw Error('Ongeldig ZIP-bestand');let start=p+30+get16(a,p+26)+get16(a,p+28);return await decompress(a.subarray(start,start+e.comp),e.raw,e.method)}
+  async text(path){let data=await this.bytes(path);return data===null?null:utf8.decode(data)}
+ }
+ const xml=(s)=>{let d=new DOMParser().parseFromString(s,'application/xml');if(d.querySelector('parsererror'))throw Error('Ongeldige XML binnen werkmap');return d};
+ const byLocal=(p,name)=>[...p.getElementsByTagName('*')].filter(e=>e.localName===name);
+ const aGet=(tag,key)=>{let m=new RegExp('(?:^|\\s)'+key+'="([^"]*)"').exec(tag);return m?decodeXML(m[1]):''};
+ const parseDate=(n,date1904=false)=>{let ms=Date.UTC(date1904?1904:1899,date1904?0:11,date1904?1:30)+Math.round(n*86400000);let d=new Date(ms);return Number.isFinite(d.getTime())?d.toISOString().slice(0,Number.isInteger(n)?10:19).replace('T',' '):n};
+ function extractStyles(doc){if(!doc)return new Set();let fmt=new Map();for(let e of byLocal(doc,'numFmt'))fmt.set(Number(e.getAttribute('numFmtId')),e.getAttribute('formatCode')||'');
+  let cellXfs=byLocal(doc,'cellXfs')[0],xfs=cellXfs?[...cellXfs.children]:[];
+  let dateIds=new Set([14,15,16,17,18,19,20,21,22,27,30,36,45,46,47,50,57]);let styles=new Set();
+  xfs.forEach((e,i)=>{let id=Number(e.getAttribute('numFmtId'));let f=fmt.get(id)||'';if(dateIds.has(id)||(/(?:[dyhms])/i.test(f.replace(/"[^"]*"|\\./g,''))&&!/^[0#.,%\-\s]+$/.test(f)))styles.add(i)});return styles;
+ }
+ async function parseXlsx(buf,onProgress){let zip=new Zip(buf),work=await zip.text('xl/workbook.xml');if(!work)throw Error('Dit bestand bevat geen Excel-werkmap');let wdoc=xml(work),relDoc=xml(await zip.text('xl/_rels/workbook.xml.rels')||'<root/>'),rels=new Map();for(let x of byLocal(relDoc,'Relationship'))rels.set(x.getAttribute('Id'),x.getAttribute('Target'));
+  let filePaths=[];for(let s of byLocal(wdoc,'sheet')){let name=s.getAttribute('name'),rid=s.getAttribute('r:id')||s.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id');let path=rels.get(rid)||'';if(path.startsWith('/'))path=path.slice(1);else if(!path.startsWith('xl/'))path='xl/'+path;filePaths.push({name,path})}
+  let base=byLocal(wdoc,'workbookPr')[0],date1904=base&&(base.getAttribute('date1904')==='1'||base.getAttribute('date1904')==='true');let styleText=await zip.text('xl/styles.xml'),dateStyles=styleText?extractStyles(xml(styleText)):new Set();
+  onProgress?.(3,'Gedeelde celwaarden lezen');let stringText=await zip.text('xl/sharedStrings.xml');let shared=[];
+  if(stringText){let sd=xml(stringText);for(let si of byLocal(sd,'si')){let ts=byLocal(si,'t');shared.push(ts.map(t=>t.textContent).join(''))}}
+  let sheets=[];
+  for(let i=0;i<filePaths.length;i++){
+   let item=filePaths[i];onProgress?.(Math.round(8+84*i/Math.max(1,filePaths.length)),'Tabblad '+item.name+' lezen');
+   let data=await zip.text(item.path);if(!data)continue;
+   let rows=[],rowRE=/<(?:\w+:)?row\b([^>]*?)(?:\/>|>([\s\S]*?)<\/(?:\w+:)?row>)/g,m;
+   while((m=rowRE.exec(data))){let ri=Number(aGet(m[1],'r'))-1;if(!Number.isFinite(ri)||ri<0)ri=rows.length;let cells=[],cellRE=/<(?:\w+:)?c\b([^>]*?)(?:\/>|>([\s\S]*?)<\/(?:\w+:)?c>)/g,c;
+    while((c=cellRE.exec(m[2]||''))){let ref=aGet(c[1],'r'),rc=sheetRef(ref),col=rc?rc.col:cells.length,typ=aGet(c[1],'t'),sty=Number(aGet(c[1],'s')||0),body=c[2]||'',v=/<(?:\w+:)?v>([\s\S]*?)<\/(?:\w+:)?v>/.exec(body),inline=/<(?:\w+:)?is\b[^>]*>([\s\S]*?)<\/(?:\w+:)?is>/.exec(body),f=/<(?:\w+:)?f\b/.test(body);let value=v?decodeXML(v[1]):'';
+     if(typ==='s')value=shared[Number(value)]??'';
+     else if(typ==='inlineStr'&&inline){value=[...inline[1].matchAll(/<(?:\w+:)?t\b[^>]*>([\s\S]*?)<\/(?:\w+:)?t>/g)].map(x=>decodeXML(x[1])).join('')}
+     else if(typ==='b')value=value==='1';
+     else if(typ==='n'||(!typ&&value!=='')){let n=Number(value);value=Number.isFinite(n)?(dateStyles.has(sty)?parseDate(n,date1904):n):value}
+     if(!v&&!inline&&!f)value='';cells[col]=value;
+    }
+    rows[ri]=cells;
+   }
+   sheets.push({name:item.name,rows:rows.filter(Boolean)});if(i%2===0)await new Promise(r=>setTimeout(r,0));
+  }
+  onProgress?.(94,'Relaties opbouwen');return sheets;
+ }
+ // Old Excel 97-2003: native CFB/OLE + BIFF8 reader, including mini streams and SST continuation records.
+ function parseCfb(ab){let a=new Uint8Array(ab);if(a.length<512||get32(a,0)!==0xe011cfd0||get32(a,4)!==0xe11ab1a1)throw Error('Geen geldig Excel 97-2003 bestand');let sz=1<<get16(a,0x1e),msz=1<<get16(a,0x20);if(sz!==512&&sz!==4096)throw Error('Ongeldige OLE-sectorgrootte');
+  let sid=(n)=>{let o=512+n*sz;return a.subarray(o,o+sz)},difat=[],next=[];for(let i=0;i<109;i++){let s=get32(a,0x4c+4*i);if(s<0xfffffffa)difat.push(s)}
+  let ext=get32(a,0x44),dn=get32(a,0x48);
+  for(let k=0;k<dn&&ext<0xfffffffa;k++){let sec=sid(ext);for(let j=0;j<sz/4-1;j++){let s=get32(sec,j*4);if(s<0xfffffffa)difat.push(s)}ext=get32(sec,sz-4)}
+  let fat=[];for(let j=0;j<difat.length;j++){let sec=sid(difat[j]);for(let x=0;x<sz;x+=4)fat.push(get32(sec,x))}
+  function stream(start,max,chain,read){let out=[],cur=start,count=0;while(cur<0xfffffffa&&cur!==0xffffffff&&count++<Math.min(200000,Math.ceil(max/(read||sz))+4)){out.push(chain(cur));cur=(fat[cur]??0xffffffff)}let joined=new Uint8Array(out.length*sz);out.forEach((s,i)=>joined.set(s,i*sz));return joined.slice(0,max)}
+  const standard=(start,size)=>stream(start,size,sid,sz);
+  let dir=standard(get32(a,0x30),Math.max(sz,sz*16)),entries=[];
+  for(let i=0;i+127<dir.length;i+=128){let nlen=get16(dir,i+64);if(!nlen||nlen>64)continue;let type=dir[i+66],name='';for(let k=i;k<i+nlen-2;k+=2)name+=String.fromCharCode(get16(dir,k));let lo=get32(dir,i+120),hi=get32(dir,i+124);entries.push({name,type,start:get32(dir,i+116),size:lo+hi*4294967296})}
+  let root=entries.find(e=>e.type===5),book=entries.find(e=>e.type===2&&/^(Workbook|Book)$/i.test(e.name));if(!book)throw Error('OLE-bestand bevat geen Excelwerkmap');
+  let cutoff=get32(a,0x38);if(book.size>=cutoff)return standard(book.start,book.size);
+  let miniFat=[],first=get32(a,0x3c),cur=first,nmini=get32(a,0x40),n=0;
+  while(cur<0xfffffffa&&n++<nmini){let sec=sid(cur);for(let k=0;k<sz;k+=4)miniFat.push(get32(sec,k));cur=fat[cur]??0xffffffff}
+  if(!root)throw Error('OLE-ministream ontbreekt');let rootData=standard(root.start,root.size),chunks=[],pos=book.start,safe=0;
+  while(pos<0xfffffffa&&safe++<100000){let o=pos*msz;chunks.push(rootData.slice(o,o+msz));pos=miniFat[pos]??0xffffffff}
+  let out=new Uint8Array(chunks.length*msz);chunks.forEach((x,i)=>out.set(x,i*msz));return out.slice(0,book.size);
+ }
+ function biffSST(chunks){let ix=0,at=0;
+  const advance=()=>{while(ix<chunks.length&&at>=chunks[ix].length){ix++;at=0}};
+  const get=()=>{advance();return ix<chunks.length?chunks[ix][at++]:0};
+  const word=()=>get()|get()<<8;
+  const dword=()=>((get()|get()<<8|get()<<16|get()<<24)>>>0);
+  if(!chunks.length)return [];dword();let unique=dword(),out=[];
+  for(let k=0;k<Math.min(unique,2000000);k++){
+   if(ix>=chunks.length)break;
+   let count=word(),flags=get(),wide=!!(flags&1),rich=flags&8?word():0,ext=flags&4?dword():0;
+   let text='';for(let i=0;i<count;i++){
+    if(at>=chunks[ix].length){ix++;at=0;if(ix>=chunks.length)break;wide=!!(get()&1)}
+    let code=wide?word():get();text+=String.fromCharCode(code);
+   }
+   for(let i=0;i<rich*4+ext;i++)get();out.push(text);
+  }
+  return out;
+ }
+ function excelRK(bits){let raw=bits>>>0,result;if(raw&2)result=(raw>>2);else{let a=new ArrayBuffer(8),d=new DataView(a);d.setUint32(0,0,true);d.setUint32(4,raw&0xfffffffc,true);result=d.getFloat64(0,true)}if(raw&1)result/=100;return result}
+ function parseXls(ab,onProgress){let data=parseCfb(ab),dv=new DataView(data.buffer,data.byteOffset,data.byteLength),pos=0,bounds=[],sst=[],xfs=[],custom=new Map(),date1904=false;
+  while(pos+4<=data.length){let type=get16(data,pos),len=get16(data,pos+2),body=pos+4,end=body+len;if(end>data.length)break;
+   if(type===0x0085){let at=get32(data,body),kind=data[body+5],count=data[body+6],flags=data[body+7],name='';for(let j=0;j<count;j++)name+=String.fromCharCode(flags&1?get16(data,body+8+j*2):data[body+8+j]);if(kind===0)bounds.push({name,at})}
+   if(type===0x00fc){let chunks=[data.subarray(body,end)],peek=end;while(peek+4<=data.length&&get16(data,peek)===0x003c){let n=get16(data,peek+2);chunks.push(data.subarray(peek+4,peek+4+n));peek+=4+n}sst=biffSST(chunks);pos=peek;continue}
+   if(type===0x00e0)xfs.push(get16(data,body+2));
+   if(type===0x041e){let fmtid=get16(data,body),n=get16(data,body+2),wide=data[body+4]&1,str='';for(let j=0;j<n;j++)str+=String.fromCharCode(wide?get16(data,body+5+j*2):data[body+5+j]);custom.set(fmtid,str)}
+   if(type===0x0022)date1904=!!get16(data,body);
+   pos=end;if(type===0x000a)break;
+  }
+  const dateIds=new Set([14,15,16,17,18,19,20,21,22,27,30,36,45,46,47,50,57]);
+  const format=(v,xf)=>{let id=xfs[xf]??0;let pattern=custom.get(id)||'';return Number.isFinite(v)&&(dateIds.has(id)||(/[dyhms]/i.test(pattern.replace(/"[^"]*"|\\./g,''))&&!/^[0#.,%\s\-]+$/.test(pattern)))?parseDate(v,date1904):v};
+  const result=[];for(let si=0;si<bounds.length;si++){let {name,at}=bounds[si],stop=Math.min(data.length,...bounds.filter(x=>x.at>at).map(x=>x.at));let rows=[],p=at;
+   while(p+4<=stop){let type=get16(data,p),length=get16(data,p+2),start=p+4,end=start+length;if(end>stop)break;let r=get16(data,start),c=get16(data,start+2),xf=get16(data,start+4),val=null;
+    if(type===0x00fd)val=sst[get32(data,start+6)]??'';
+    else if(type===0x0203)val=format(dv.getFloat64(start+6,true),xf);
+    else if(type===0x027e)val=format(excelRK(get32(data,start+6)),xf);
+    else if(type===0x00bd){let last=get16(data,end-2);for(let i=0;i<=last-c;i++){let col=c+i,j=start+4+i*6,fx=get16(data,j);(rows[r]??=[])[col]=format(excelRK(get32(data,j+2)),fx)}p=end;continue}
+    else if(type===0x0204){let sl=get16(data,start+6);val=latin.decode(data.slice(start+8,start+8+sl))}
+    else if(type===0x0006){let marker=get16(data,start+6),nonNum=data[start+12]===255&&data[start+13]===255;if(!nonNum)val=format(dv.getFloat64(start+6,true),xf)}
+    else if(type===0x0205){val=data[start+6]?Boolean(data[start+7]):String(data[start+7])}
+    else if(type===0x00d6||type===0x0012){p=end;continue}
+    if(val!==null&&Number.isInteger(r)&&Number.isInteger(c)&&r<1000000&&c<20000){(rows[r]??=[])[c]=val}
+    p=end;if(type===0x000a)break;
+   }
+   result.push({name,rows:rows.filter(Boolean)});onProgress?.(Math.round(10+82*(si+1)/Math.max(1,bounds.length)),'Tabblad '+name+' gelezen');
+  }
+  return result;
+ }
+ function parseDelim(text,sep){let rows=[],row=[],field='',quoted=false;for(let i=0;i<text.length;i++){let x=text[i];if(x==='"'){if(quoted&&text[i+1]==='"'){field+='"';i++}else quoted=!quoted}else if(x===sep&&!quoted){row.push(field);field=''}else if((x==='\n'||x==='\r')&&!quoted){if(x==='\r'&&text[i+1]==='\n')i++;row.push(field);if(row.some(x=>x.trim()!==''))rows.push(row);row=[];field=''}else field+=x}row.push(field);if(row.some(x=>x.trim()!==''))rows.push(row);return rows}
+ function parseCsv(bytes,name){let txt=utf8.decode(bytes);if(txt.charCodeAt(0)===65279)txt=txt.slice(1);let first=txt.split(/\r?\n/,1)[0],choices=['\t',';',',','|'],sep=choices.sort((a,b)=>first.split(b).length-first.split(a).length)[0];return [{name:name.replace(/\.[^.]*$/,''),rows:parseDelim(txt,sep)}]}
+ async function readFile(file,onProgress){let data=await file.arrayBuffer(),a=new Uint8Array(data),name=file.name.toLowerCase();onProgress?.(1,'Bestand lezen');let sheets;
+  if(a.length>=8&&get32(a,0)===0xe011cfd0&&get32(a,4)===0xe11ab1a1)sheets=parseXls(data,onProgress);
+  else if(a.length>=4&&get32(a,0)===0x04034b50)sheets=await parseXlsx(data,onProgress);
+  else if(/\.(csv|tsv)$/i.test(name))sheets=parseCsv(a,file.name);
+  else throw Error('Bestandsformaat niet herkend. Gebruik .xlsx, .xls, .xlsm, .csv of .tsv');
+  onProgress?.(95,'Datamodel maken');return sheets;
+ }
+ return {readFile,inflateRaw,parseXls,parseXlsx};
+})();
+
+'use strict';
+const Engine=(()=>{
+ const nl=new Intl.NumberFormat('nl-NL');
+ const fold=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[’‘]/g,"'").trim();
+ const key=s=>fold(s).replace(/[^a-z0-9]/g,'');
+ const words=s=>fold(s).replace(/[^a-z0-9.-]+/g,' ').split(/\s+/).filter(Boolean);
+ const stop=new Set(('wat wie welke welk hoe is zijn het de een en of van voor met bij naar over uit op in om als dan anders onder tussen ook die dat deze dit daar daarbij daarvan ervoor er na nog moet moeten kan kunnen wordt worden proces processen activiteit activiteiten stap stappen bron bronnen regel regels toon geef laat mij me alle aantal per binnen volgende vorige eerste laatste dezelfde graag eens informatie gekoppeld waarin waarover welke'.split(' ')));
+ const toNum=s=>{let t=String(s??'').replace(/\s/g,'').replace(',','.');return t!==''&&Number.isFinite(Number(t))?Number(t):null};
+ const aliases={
+  processCode:['procescode','proces id','procedurecode','workflow id','procesnummer'],processName:['procesnaam','proces naam','proces','workflow','procedurenaam'],activityId:['activiteit id','activiteit-id','actie id'],phase:['abc fase','abc-fase','consolidatiefase abc','definitieve fase','voorgestelde fase','fase','hoofdfase'],subphase:['abc subfase','abc-subfase','subfase','subfase abc'],text:['contexttekst','activiteit gestandaardiseerd','brontekst genormaliseerd','genormaliseerde tekst','activiteit/bronregel','activiteit','omschrijving','beschrijving','tekst'],actor:['actoren','actor of systeem','actor','rol','betrokken actor','beslissende/betrokken actor'],system:['systemen','systeem','applicatie'],asset:['asset','middel','middelen','object'],condition:['als / conditie','conditie/beslissing','beslisvraag','situatie / conditie','conditie','voorwaarde'],nextId:['volgende activiteit-id','dan / vervolg-id','volgende stap-id'],prevId:['vorige activiteit-id'],altId:['alternatief vervolg-id','anders / vervolg-id'],source:['bronverwijzing','bronbestand','bron'],page:['bronpagina','startpagina','pagina'],confidence:['zekerheid','classificatiezekerheid','ocr-zekerheid'],validation:['validatiestatus','reviewstatus context','reviewstatus','abc-review'],stepNr:['werkmodel zeta-stapnr','stapnummer','volgorde'],stepName:['werkmodel zeta-stapnaam','stapnaam'],role:['rol in activiteit','relatie/rol uit plaat'],assetPin:['assetmodel nova-pin / ontsluiting','pin / ontsluiting'],primacy:['primair/secundair'],classification:['besliskarakter'],id:['beslisregel-id','overgang-id','allocatie-id','regel-id']};
+ const roles={processes:['processen','procesregister','procedures'],context:['contextactiviteiten','activiteitcontext','contextactiviteiten'],activities:['activiteiten','procesactiviteiten'],decisions:['chatbot beslisregels','beslisregels','beslissingen'],transitions:['beslissingen en overgangen','overgangen'],allocation:['middelenallocatie','assetallocatie','middelenkoppelingen'],assets:['middelenregister','assetregister'],actors:['functionele rollen','rollenregister'],systems:['applicatieregister','systemenregister'],links:['rollen en systemen'],definitions:['begrippen','begrippenlijst','glossarium'],tests:['testvragen chatbot','testvragen'],train:['trainvragen chatbot','trainvragen'],phaseMatrix:['fasematrix abc','fasematrix'],classification:['abc classificatieregels'],additions:['procesaanvullingen']};
+ const typeRole=n=>{let k=key(n);for(let [role,nn] of Object.entries(roles))if(nn.some(x=>key(x)===k))return role;return null};
+ const fmt=n=>nl.format(n??0);
+ function detectHeader(rows){let best=-Infinity,at=0,limit=Math.min(20,rows.length);for(let i=0;i<limit;i++){let r=rows[i]||[],vals=r.filter(v=>v!==''&&v!==null&&v!==undefined),str=vals.filter(v=>typeof v==='string'),uniq=new Set(str.map(key)).size;
+  let matched=str.filter(v=>Object.values(aliases).some(a=>a.some(b=>key(b)===key(v)))).length;
+  let score=vals.length*2+uniq+matched*4-(i*.6)+(vals.length<2?-12:0);
+  if(score>best){best=score;at=i}
+ }return at}
+ function makeTables(raw){return raw.map(item=>{let pos=detectHeader(item.rows),r0=item.rows[pos]||[],width=Math.max(r0.length,2),columns=r0.map((c,i)=>String(c||('Kolom '+(i+1))).trim()),used=new Map();columns=columns.map(x=>{let k=key(x),n=(used.get(k)||0)+1;used.set(k,n);return n>1?x+' '+n:x});let lookup=new Map(columns.map(c=>[key(c),c]));
+  let rows=[];for(let ri=pos+1;ri<item.rows.length;ri++){let data=item.rows[ri];if(!data||!data.some(v=>v!==null&&v!==''&&v!==undefined))continue;let o={};for(let ci=0;ci<width;ci++){let val=data[ci];if(val!==undefined&&val!==''&&val!==null)o[columns[ci]]=val}Object.defineProperties(o,{__sheet:{value:item.name,enumerable:false},__row:{value:ri+1,enumerable:false},__table:{value:null,writable:true,enumerable:false}});rows.push(o)}
+  let table={name:item.name,role:typeRole(item.name),columns,lookup,rows,headerRow:pos+1};rows.forEach(r=>r.__table=table);return table;
+ })}
+ const column=(table,field)=>{if(!table)return null;let options=aliases[field]||[field];for(let a of options){let c=table.lookup.get(key(a));if(c)return c}return null};
+ const get=(row,field)=>{if(!row)return '';let c=column(row.__table,field);return c?row[c]??'':''};
+ const str=(row,field)=>String(get(row,field)??'').trim();
+ const source=row=>{if(!row)return '';let p=str(row,'page'),s=str(row,'source');let t=row.__sheet+' · rij '+row.__row;return t+(p?' · p. '+p:'')+(s&&s!==row.__sheet?' · '+s:'')};
+ const matchWhole=(body,needle)=>{if(!body||!needle)return false;let a=fold(body),b=fold(needle);if(b.length<3)return new RegExp('(?:^|[^a-z0-9])'+b.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?:$|[^a-z0-9])').test(a);return a.includes(b)};
+ const descText=r=>str(r,'text')||str(r,'condition')||str(r,'stepName')||str(r,'asset')||str(r,'actor')||Object.entries(r).filter(([k,v])=>typeof v==='string'&&v.length>12).slice(0,2).map(x=>x[1]).join(' · ');
+ function modelFrom(raw){let tables=makeTables(raw),byRole={};for(let t of tables)if(t.role&&!byRole[t.role])byRole[t.role]=t;
+  let byProcess=new Map(),codes=new Map(),activity=new Map(),contexts=new Map(),allocations=new Map(),decisions=new Map(),processes=new Map(),names=new Map(),linkCount=0;
+  for(let table of tables){for(let row of table.rows){let code=str(row,'processCode').toUpperCase();if(code){let per=byProcess.get(code);if(!per)byProcess.set(code,per=new Map());let r=per.get(table.name)||[];r.push(row);per.set(table.name,r);codes.set(code,true)}
+   if(table.role==='processes'&&code){processes.set(code,row);names.set(code,str(row,'processName'))}
+   if(table.role==='context'||table.role==='activities'){let id=String(get(row,'activityId'));if(id){let map=table.role==='context'?contexts:activity;if(!map.has(id))map.set(id,row)}}
+   if(table.role==='allocation'){let id=String(get(row,'activityId'));if(id){if(!allocations.has(id))allocations.set(id,[]);allocations.get(id).push(row);linkCount++}}
+   if(table.role==='decisions'){let id=String(get(row,'activityId'));if(id){if(!decisions.has(id))decisions.set(id,[]);decisions.get(id).push(row)}}
+  }}
+  if(!processes.size){for(let code of codes.keys()){let one=[...byProcess.get(code).values()].flat().find(r=>str(r,'processName'));if(one)processes.set(code,one);names.set(code,str(one,'processName'))}}
+  let main=byRole.context||byRole.activities||tables.filter(x=>!['tests','train','allocation','transitions','assets'].includes(x.role)).sort((a,b)=>b.rows.length-a.rows.length)[0]||tables[0];
+  let ctx=[...(byRole.context?.rows||byRole.activities?.rows||[])],allctx=ctx.slice().sort((a,b)=>{let ca=str(a,'processCode'),cb=str(b,'processCode');if(ca!==cb)return ca.localeCompare(cb,undefined,{numeric:true});let x=toNum(get(a,'activityId')),y=toNum(get(b,'activityId'));return x!==null&&y!==null?x-y:a.__row-b.__row});
+  let actByProc=new Map();for(let r of allctx){let code=str(r,'processCode').toUpperCase();if(!actByProc.has(code))actByProc.set(code,[]);actByProc.get(code).push(r)}
+  let glossary=new Map();for(let r of byRole.definitions?.rows||[]){let k=String(r['Begrip']||'');if(!k)continue;let a=String(r['Synoniemen/zoekwoorden']||'').split(/[,;|]/).map(x=>x.trim());glossary.set(key(k),[k,...a])}
+  const fn=(code,role)=>{let per=byProcess.get(code?.toUpperCase());if(!per)return [];let t=byRole[role];return t?per.get(t.name)||[]:[]};
+  return {tables,byRole,byProcess,codes:[...codes.keys()].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})),processes,names,activity,contexts,allocations,decisions,main,ctx,allctx,actByProc,glossary,linkCount,fn,totalRows:tables.reduce((n,t)=>n+t.rows.length,0)};
+ }
+ const emptyContext=()=>({process:null,compared:[],activity:null,phase:null,actor:null,system:null,asset:null,lastIntent:null,lastRows:[],lastSheet:null,lastResponse:null,pending:null,pageOffset:0,history:[]});
+ const db={model:null,ctx:emptyContext()};
+ function init(raw){db.model=modelFrom(raw);db.ctx=emptyContext();return db.model}
+ function reset(){db.ctx=emptyContext()}
+ function ctxInfo(){return structuredClone({process:db.ctx.process,activity:db.ctx.activity,phase:db.ctx.phase,actor:db.ctx.actor,system:db.ctx.system,asset:db.ctx.asset,lastIntent:db.ctx.lastIntent})}
+ function pName(code){return db.model?.names.get(code)||code}
+ function resolveProcess(q){let m=db.model,found=[];for(let code of m.codes){let pat=new RegExp('(^|[^a-z0-9.\\-])'+code.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?=$|[^a-z0-9.\\-])','i');if(pat.test(q))found.push(code)}
+  for(let [c,n] of m.names){let name=fold(n);if(name&&name.length>8&&fold(q).includes(name)&&!found.includes(c))found.push(c)}
+  return found;
+ }
+ function resolvePhase(q){let f=fold(q);let found=[];let patterns={'aanmelding':['aanmelding','signaleren en alarmeren'],'beoordeling':['beoordeling','beeldvorming','situatie beoordelen'],'afhandeling':['afhandeling','uitvoering','afwikkeling'],'te beoordelen':['te beoordelen','nog te plotten']};
+  for(let [p,terms] of Object.entries(patterns))if(terms.some(t=>new RegExp('(?:^|[^a-z])'+t.replace(' ','\\s+')+'(?:$|[^a-z])').test(f)))found.push(p);
+  return found.length===1?found[0]:null;
+ }
+ function detectName(q,columnName,tabRole){let t=db.model?.byRole[tabRole],val=column(t,columnName);if(!t||!val)return null;let candidates=[...new Set(t.rows.map(x=>String(x[val]||'').trim()))].filter(x=>x.length>=3).sort((a,b)=>b.length-a.length);for(let a of candidates){if(matchWhole(q,a))return a}return null}
+ function extractActivity(q){let m=/\bactiviteit(?:s|-id| id)?\s*(?:nr\.?|nummer|#|:)?\s*(\d+)\b/i.exec(q)||/\b(?:activity id|activity-id|id)\s*(?:#|:)?\s*(\d+)\b/i.exec(q);return m?m[1]:null}
+ function intentOf(q){let f=fold(q);
+  if(/^(hallo|hoi|goedemorgen|help|hulp|wat kan je|wat kun je|wat kan ik vragen)[?.! ]*$/.test(f))return 'help';
+  if(/\b(toon meer|meer resultaten|volgende resultaten|laat meer zien)\b/.test(f))return 'more';
+  if(/\b(vergelijk|verschil|verschillen|versus| vs )\b/.test(f))return 'compare';
+  if(/\b(waarom|onderbouwing|hoe weet je|welke bron|herkomst|bronverwijzing|bewijs|waar komt dat vandaan|hoe kom je daarbij|waar staat dat)\b/.test(f))return 'why';
+  if(/\b(wat betekent|betekenis van|definitie van|definieer|wat is het begrip)\b/.test(f))return 'definition';
+  if(/\b(ketenoverzicht|alle relaties|welke relaties|afhankelijkheden|keten van|alles rond activiteit|volledige context|samenhang tussen|wat hoort allemaal bij)\b/.test(f))return 'network';
+  if(/\b(wie neemt het besluit|wie beslist|mens of systeem|rol versus systeem)\b/.test(f))return 'responsibility';
+  if(/\b(moet .*dicht|mag .*sluiten|moet .*sluiten|moet .*ontruimd|wel of niet afsluiten)\b/.test(f))return 'safety';
+  if(/\b(wat gebeurt er als|wat als|indien|als .*dan|welke conditie|bij welke conditie|uitkomst|beslisroute|beslisregel|beslisregels|besluiten|beslissingen|besluitvorming|keuze|ja.tak|nee.tak)\b/.test(f))return 'decision';
+  if(/\b(eerste|laatste|volgende stap|volgende activiteit|daarna|vervolgens|ervoor|vorige stap|stap ervoor|wat komt na|wat komt voor|voorgaande|waar begint|waar eindigt)\b/.test(f))return 'sequence';
+  if(/\b(wie|welke rol|welke actor|wie doet|verantwoordelijk|betrokken partijen|rolverdeling|welke medewerkers)\b/.test(f))return 'actors';
+  if(/\b(welke systemen|welk systeem|applicaties|welke applicatie|automatisch|systeem.*gebruikt|systemen betrokken)\b/.test(f))return 'systems';
+  if(/\b(asset|assets|middelen|voorzieningen|werkplek|apparatuur|benodigdheden|monitor|pin|ontsluiting)\b/.test(f))return 'assets';
+  if(/\b(review|kwaliteit|zekerheid|onzeker|validatie|valideren|gevalideerd|te beoordelen|ontbreekt|ontbreken|niet gevalideerd|betrouwbaar|ocr)\b/.test(f))return 'quality';
+  if(/\b(welke fase|in welke fase|subfase|fasen|fases|faseverdeling|per fase)\b/.test(f))return 'phase';
+  if(/\b(welke processen|toon processen|alle processen|processenoverzicht|welke proces|proceslijst|lijst processen)\b/.test(f))return 'processes';
+  if(/\b(welk proces hoort bij|bij welk proces hoort)\b/.test(f))return 'process';
+  if(/\b(overzicht|dataset|tabbladen|welke tabellen|hoeveel regels in totaal|wat zit erin)\b/.test(f))return 'overview';
+  if(/\b(tel|hoeveel|aantal|meeste|minste|verdeling|top\s*\d+|gemiddeld|totaal|statistiek|per proces)\b/.test(f))return 'stats';
+  if(/\b(wat is proces|leg proces|beschrijf proces|details van proces|wat houdt proces|procesinformatie)\b/.test(f))return 'process';
+  if(/\b(welke activiteiten|alle activiteiten|welke handelingen|welke stappen|toon activiteiten|toon stappen)\b/.test(f))return 'activities';
+  return 'search';
+ }
+ const recordId=r=>String(get(r,'activityId')||get(r,'id')||r?.__row||'');
+ const sourceRows=rows=>[...new Set(rows.filter(Boolean).slice(0,10).map(source))].slice(0,8);
+ function basic(title,lead,extras={}){return {title,lead,items:[],table:null,chart:null,kv:null,notes:[],warnings:[],sources:[],followups:[],rows:[],...extras}}
+ function addSources(answer,rows){answer.sources=sourceRows(rows);return answer}
+ const preview=(t,n=330)=>{let s=String(t??'');return s.length>n?s.slice(0,n-1)+'…':s};
+ const item=(title,body,meta='',tags=[])=>({title:String(title),body:preview(body),meta:String(meta),tags});
+ function getCtxActivity(id){let m=db.model;return m?.contexts.get(String(id))||m?.activity.get(String(id))||null}
+ function describeActivity(r){let id=str(r,'activityId'),phase=str(r,'phase'),sub=str(r,'subphase'),text=str(r,'text')||descText(r),sourceId=source(r);let original=db.model.activity.get(id);
+  let a={title:'Activiteit '+id,body:text,meta:sourceId,tags:[]};if(phase)a.tags.push(phase);if(sub)a.tags.push(sub);let actor=str(r,'actor'),syst=str(r,'system');if(actor)a.tags.push('Rollen: '+preview(actor,110));if(syst)a.tags.push('Systemen: '+preview(syst,110));return a;
+ }
+ function selectCtxRows(process){let m=db.model,c=db.ctx;if(c.lastRows.length&&/^(actors|systems|assets|quality|activities|search)$/.test(c.lastIntent||'')&&c.lastRows.every(r=>r.__table?.role==='context'))return c.lastRows;
+  return process?m.actByProc.get(process)||[]:m.ctx;
+ }
+ function overview(){let m=db.model,a=basic('Datasetoverzicht',`De werkmap bevat ${fmt(m.tables.length)} tabbladen en ${fmt(m.totalRows)} gegevensregels.`,{kv:[['Processen',fmt(m.codes.length)],['Contextactiviteiten',fmt(m.ctx.length)],['Beslisregels',fmt(m.byRole.decisions?.rows.length||0)],['Middelenkoppelingen',fmt(m.byRole.allocation?.rows.length||0)],['Testvragen',fmt(m.byRole.tests?.rows.length||0)]],notes:['Tabbladen met handleidingen, promptteksten of testvragen worden niet als bron voor proceshandelingen gebruikt.']});a.items=m.tables.slice(0,12).map(t=>item(t.name,fmt(t.rows.length)+' gegevensregels · '+fmt(t.columns.length)+' kolommen','Rij '+t.headerRow+' bevat de gedetecteerde kolomnamen'));a.followups=['Welke processen staan erin?','Hoeveel activiteiten zijn er per proces?','Welke besluiten zijn nog te valideren?'];return a}
+ function processList(q){let m=db.model,rows=[...m.processes.entries()],c=db.ctx,only=c.phase?m.codes.filter(code=>m.fn(code,'context').some(r=>fold(str(r,'phase'))===c.phase)):null;
+  if(only)rows=rows.filter(([c])=>only.includes(c));let a=basic('Procesregister',`${fmt(rows.length)} processen gevonden.`,{items:rows.slice(0,25).map(([code,r])=>item(code+' · '+pName(code),[r['Categorie'],r['Aantal gegevensregels']!==undefined?String(r['Aantal gegevensregels'])+' bronregels':''].filter(Boolean).join(' · '),source(r))),rows:rows.map(x=>x[1])});a.notes=['Gebruik een procescode voor vervolgvragen, bijvoorbeeld “Wat is de eerste activiteit in A01.1?”'];a.followups=rows.length?['Wat is de eerste activiteit van '+rows[0][0]+'?','Hoeveel activiteiten per proces?']:['Geef een datasetoverzicht'];return addSources(a,a.rows)}
+ function processDetail(code){let m=db.model,row=m.processes.get(code),steps=m.actByProc.get(code)||[],decision=m.fn(code,'decisions'),alloc=m.fn(code,'allocation'),a=basic('Proces '+code, pName(code),{kv:[['Activiteiten',fmt(steps.length)],['Beslisregels',fmt(decision.length)],['Middelenkoppelingen',fmt(alloc.length)],['Categorie',row?.['Categorie']||'Niet opgegeven']],rows:steps.slice(0,10)});if(steps.length){a.items=steps.slice(0,5).map(describeActivity);a.notes.push('Getoonde activiteiten volgen de geregistreerde volgorde in het bronbestand.')}a.followups=['Wat is de eerste activiteit?','Welke assets zijn eraan gekoppeld?','Welke besluiten horen hierbij?','Welke fasen komen voor?'];return addSources(a,[row,...steps])}
+ function stepAnswer(q,code,activityId){let m=db.model,c=db.ctx,f=fold(q),kind=/\b(eerste|begint)\b/.test(f)?'first':/\b(laatste|eindigt)\b/.test(f)?'last':/\b(vorige|ervoor|voorafgaand|voorgaande)\b/.test(f)?'prev':'next',rows=code?m.actByProc.get(code)||[]:m.ctx;
+  let base=activityId?getCtxActivity(activityId):null,selected=null,notes=[],provided=false;
+  if(kind==='first'){selected=rows[0]||null;notes.push('Eerste geregistreerde activiteit volgens bronvolgorde.')}
+  else if(kind==='last'){selected=rows.at(-1)||null;notes.push('Laatste geregistreerde activiteit volgens bronvolgorde.')}
+  else if(base){let n=str(base,kind==='prev'?'prevId':'nextId');if(n){selected=getCtxActivity(n);provided=!!selected;if(!selected)notes.push('De bron verwijst naar activiteit '+n+', maar deze is niet gevonden.')}
+   if(!selected){let idx=rows.findIndex(r=>recordId(r)===recordId(base));selected=rows[idx+(kind==='next'?1:-1)]||null;if(selected)notes.push('Er is geen expliciete overgang gevonden. Dit is alleen de naastgelegen activiteit in de bronvolgorde, niet een bewezen procesovergang.')}
+   if(provided)notes.push('De volgorde is gebaseerd op het veld '+(kind==='next'?'Volgende activiteit-ID':'Vorige activiteit-ID')+'.');
+  }else{if(kind==='next')selected=rows[0]||null;notes.push('Er is nog geen startactiviteit gekozen. De eerste geregistreerde activiteit wordt getoond.')}
+  if(!selected)return basic('Geen vervolgstap vastgesteld','Er is in deze context geen geschikte activiteit of expliciete overgang gevonden.',{warnings:['Geen ontbrekende activiteit of vervolgstap ingevuld.'],followups:['Welke processen staan erin?','Toon activiteiten']});
+  c.activity=recordId(selected);c.process=str(selected,'processCode').toUpperCase()||code;
+  let answer=basic((kind==='first'?'Eerste':kind==='last'?'Laatste':kind==='prev'?'Vorige':'Volgende')+' activiteit',`Proces ${c.process||'onbekend'} · ${pName(c.process)}`,{items:[describeActivity(selected)],rows:[selected],notes,followups:['Wie is hierbij betrokken?','Welke systemen horen erbij?','Welke assets zijn gekoppeld?','Wat gebeurt er daarna?']});
+  let alternatives=str(selected,'altId');if(alternatives)answer.notes.push('Alternatief vervolg-ID in bron: '+alternatives);
+  return addSources(answer,[selected]);
+ }
+ const conditionWords=q=>words(q).filter(w=>w.length>3&&!stop.has(w)&&!['gebeurt','beslisregels','beslisregel','besluiten','conditie','situatie','volgende','uitkomst','indien','waarbij','onderstaande','regel'].includes(w));
+ function decisionAnswer(q,code,activityId){let m=db.model,rows=activityId?m.decisions.get(activityId)||[]:code?m.fn(code,'decisions'):m.byRole.decisions?.rows||m.byRole.transitions?.rows||[];
+  let terms=conditionWords(q),generic=/\b(welke beslisregels|beslissingen|besluiten|toon.*beslisregel|beslisroute|wat zijn de besluiten)\b/i.test(q);
+  if(!generic&&terms.length>=2){let ranked=rows.map(r=>{let f=fold([str(r,'condition'),r['Situatie / conditie']||'',r['Besluit / actie']||'',str(r,'text')].join(' ')),hits=terms.filter(t=>f.includes(t)).length;return {r,hits}}).filter(x=>x.hits>=Math.min(2,terms.length)).sort((a,b)=>b.hits-a.hits);if(ranked.length)rows=ranked.map(x=>x.r)}
+  let a=basic('Beslisregels en voorwaarden',`${fmt(rows.length)} vastgelegde beslisregels of overgangen in de huidige selectie.`,{rows});a.items=rows.slice(0,10).map(r=>{
+    let id=str(r,'id'),cond=str(r,'condition'),then=String(r['DAN / vervolg-ID']||r['Besluit / actie']||r['Uitkomst ja/positief']||''),otherwise=String(r['ANDERS / vervolg-ID']||r['Uitkomst nee/negatief']||''),v=str(r,'validation'),confidence=str(r,'confidence');let body='ALS: '+(cond||'Niet ingevuld')+(then?'\nDAN: '+then:'')+(otherwise?'\nANDERS: '+otherwise:'');return item((id?id+' · ':'')+(str(r,'activityId')?'activiteit '+str(r,'activityId'):'bronregel'),body,source(r),[v,confidence].filter(Boolean))});
+  if(!rows.length)a.warnings.push('Geen expliciete beslisregel gevonden binnen deze selectie. Een uitkomst kan daarom niet worden vastgesteld.');
+  else a.notes.push('DAN- en ANDERS-waarden zijn uitsluitend overgenomen uit het Excelbestand. Een vervolg-ID is een verwijzing, geen gevalideerde uitvoering.');
+  let bad=rows.filter(r=>/te valideren|laag|te beoordelen|open/i.test([str(r,'validation'),str(r,'confidence')].join(' '))).length;if(bad)a.warnings.push(fmt(bad)+' van deze regels hebben een review- of validatiesignaal.');
+  a.followups=['Welke van deze regels zijn nog te valideren?','Welke activiteiten horen hierbij?','Toon de bronnen'];return addSources(a,rows);
+ }
+ function activitiesAnswer(q,code,activityId,phase){let m=db.model,c=db.ctx,rows=code?m.actByProc.get(code)||[]:m.ctx;
+  if(activityId){let r=getCtxActivity(activityId);rows=r?[r]:[]}
+  else if(c.actor)rows=rows.filter(r=>matchWhole(str(r,'actor'),c.actor));
+  else if(c.system)rows=rows.filter(r=>matchWhole(str(r,'system'),c.system));
+  if(phase)rows=rows.filter(r=>fold(str(r,'phase'))===phase||fold(str(r,'phase')).includes(phase));
+  let a=basic('Procesactiviteiten',`${fmt(rows.length)} activiteiten${code?' binnen '+code:''}${phase?' in de fase '+phase:''}.`,{items:rows.slice(0,9).map(describeActivity),rows,notes:['De volgorde komt uit het bronregister en is niet automatisch een uitvoeringsvolgorde.'],followups:['Wat is de eerste activiteit?','Welke rollen zijn betrokken?','Welke middelen zijn gekoppeld?','Welke fasen komen hierin voor?']});if(rows.length===1)c.activity=recordId(rows[0]);return addSources(a,rows)
+ }
+ function actorAnswer(q,code,actId){let m=db.model,c=db.ctx,r=actId?getCtxActivity(actId):null,rows=r?[r]:code?m.actByProc.get(code)||[]:m.ctx;
+  if(c.phase)rows=rows.filter(x=>fold(str(x,'phase'))===c.phase);
+  let registry=m.byRole.actors,group=new Map();for(let x of rows){let src=str(x,'actor');if(!src)continue;for(let value of src.split(/\s*[,;|]\s*/)){let n=value.trim();if(n)group.set(n,(group.get(n)||0)+1)}}
+  if(!group.size&&actId){let old=m.fn(code,'links');for(let x of old)if(str(x,'stepNr')===str(r,'stepNr')){let n=str(x,'actor');if(n&&!/systeem/i.test(str(x,'role')))group.set(n,(group.get(n)||0)+1)}}
+  let sorted=[...group].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])),chosen=c.actor?sorted.filter(x=>fold(x[0]).includes(fold(c.actor))):sorted;
+  if(chosen.length===1&&!c.actor)c.actor=chosen[0][0];
+  let a=basic('Betrokken rollen en actoren',chosen.length?`${fmt(chosen.length)} verschillende rolvermeldingen gevonden.`:'Geen expliciete actor gevonden.',{rows,items:chosen.slice(0,15).map(([name,count])=>{let register=registry?.rows.find(rr=>fold(rr['Actor'])===fold(name));return item(name,count+' activiteit'+(count===1?'':'en')+' met deze rolvermelding'+(register?' · '+String(register['Actorcategorie']||''):'')+(register?'\n'+preview(register['Interpretatieregel chatbot'],160):''),register?source(register):'',[])}),followups:['Welke activiteiten horen bij deze rol?','Welke systemen zijn betrokken?','Welke assets zijn nodig?']});
+  a.notes=['Een vermelding als betrokken actor is geen bewijs van eindverantwoordelijkheid. Verantwoordelijkheid moet expliciet in de bron zijn vastgelegd.'];return addSources(a,rows)
+ }
+ function systemAnswer(q,code,actId){let m=db.model,c=db.ctx,rows=actId?[getCtxActivity(actId)].filter(Boolean):code?m.actByProc.get(code)||[]:m.ctx;if(c.phase)rows=rows.filter(r=>fold(str(r,'phase'))===c.phase);let group=new Map();
+  for(let r of rows)for(let x of str(r,'system').split(/\s*[,;|]\s*/)){let n=x.trim();if(n)group.set(n,(group.get(n)||0)+1)}
+  let sorted=[...group].sort((a,b)=>b[1]-a[1]);let registry=m.byRole.systems;
+  let a=basic('Systemen en applicaties',`${fmt(sorted.length)} verschillende systeemvermeldingen gevonden.`,{rows,items:sorted.slice(0,18).map(([name,count])=>{let reg=registry?.rows.find(r=>fold(r['Systeem'])===fold(name));return item(name,fmt(count)+' betrokken activiteit'+(count===1?'':'en')+(reg?'\n'+preview(reg['Interpretatieregel chatbot'],170):''),reg?source(reg):'')}),followups:['Welke activiteiten gebruiken deze systemen?','Welke assets horen daarbij?','Welke actoren zijn betrokken?']});a.notes.push('Een technisch systeem wordt niet als menselijke proceseigenaar aangemerkt.');return addSources(a,rows)
+ }
+ function assetAnswer(q,code,actId,reuseRows=null){let m=db.model,c=db.ctx,allocs=reuseRows|| (actId?m.allocations.get(String(actId))||[]:code?m.fn(code,'allocation'):m.byRole.allocation?.rows||[]);
+  if(c.phase)allocs=allocs.filter(r=>fold(str(r,'phase'))===c.phase);
+  let nm=fold(q),wanted=/\b(alleen primair|primaire|primair)\b/.test(nm)?'primair':/\b(secundair|secundaire)\b/.test(nm)?'secundair':null;
+  if(wanted)allocs=allocs.filter(r=>fold(str(r,'primacy'))===wanted);
+  let group=new Map();for(let r of allocs){let name=str(r,'asset');if(!name)continue;let ent=group.get(name)||{name,n:0,r:[],activities:new Set(),prim:new Set(),pin:new Set()};ent.n++;ent.r.push(r);ent.activities.add(str(r,'activityId'));let prim=str(r,'primacy'),pin=str(r,'assetPin');if(prim)ent.prim.add(prim);if(pin)ent.pin.add(pin);group.set(name,ent)}
+  if(c.asset)group=new Map([...group].filter(([name])=>matchWhole(name,c.asset)));
+  let sorted=[...group.values()].sort((a,b)=>b.n-a.n||a.name.localeCompare(b.name)),a=basic('Middelen en assets',`${fmt(allocs.length)} koppelingen, verdeeld over ${fmt(sorted.length)} unieke assets${actId?' bij activiteit '+actId:''}.`,{items:sorted.slice(0,16).map(g=>item(g.name,`${fmt(g.n)} koppeling(en) · ${fmt(g.activities.size)} activiteit(en)`+(g.pin.size?'\nOntsluiting: '+[...g.pin].slice(0,2).join(', '):''),source(g.r[0]),[...g.prim])),rows:allocs,kv:[['Allocatieregels',fmt(allocs.length)],['Unieke assets',fmt(sorted.length)],['Primaire koppelingen',fmt(allocs.filter(r=>fold(str(r,'primacy'))==='primair').length)],['Secundaire koppelingen',fmt(allocs.filter(r=>fold(str(r,'primacy'))==='secundair').length)]],followups:['Welke zijn primair?','Welke applicaties horen erbij?','Welke activiteiten gebruiken deze assets?']});
+  if(!m.byRole.allocation)a.warnings=['Het bronbestand bevat geen expliciete middelentoewijzing. Een assetkoppeling kan niet worden afgeleid.'];
+  return addSources(a,allocs)
+ }
+ function phaseAnswer(q,code,actId){let m=db.model,c=db.ctx,rows=actId?[getCtxActivity(actId)].filter(Boolean):code?m.actByProc.get(code)||[]:m.ctx;
+  if(!actId&&/\b(hierin|daarin|deze|die|hiervan|daarvan)\b/.test(fold(q))&&c.lastResponse?.rows?.length&&c.lastResponse.rows[0]?.__table?.role==='context')rows=c.lastResponse.rows;
+  if(c.phase&& !actId)rows=rows.filter(r=>fold(str(r,'phase'))===c.phase);
+  let group=new Map();for(let r of rows){let name=str(r,'phase')||'Niet ingevuld';group.set(name,(group.get(name)||0)+1)}let pairs=[...group].sort((a,b)=>b[1]-a[1]),a=basic('ABC-fasen en indeling',`Verdeling van ${fmt(rows.length)} activiteiten${code?' in '+code:''}.`,{chart:pairs,rows,followups:['Toon alle activiteiten in de fase Beoordeling','Welke fasen zijn nog te beoordelen?','Welke rollen zijn betrokken?']});
+  if(actId&&rows[0])a.items=[describeActivity(rows[0])];return addSources(a,rows)
+ }
+ function qualityAnswer(q,code,actId){let m=db.model,c=db.ctx,f=fold(q),referBack=/\b(deze|die|hiervan|daarvan|ervan)\b/.test(f),prior=c.lastResponse?.rows||[],role=/\b(besluit|beslisregel|beslissingen)\b/.test(f)||referBack&&prior[0]?.__table?.role==='decisions'?'decisions':'context',rows=actId?(role==='decisions'?m.decisions.get(actId)||[]:[getCtxActivity(actId)].filter(Boolean)):code?m.fn(code,role):(m.byRole[role]?.rows||[]);if(referBack&&prior.length&&prior[0]?.__table?.role===role)rows=prior;
+  let isReview=r=>/te valideren|te beoordelen|laag|open|onzeker|review/i.test([str(r,'validation'),str(r,'confidence'),String(r['ABC-review']||'')].join(' '));let review=rows.filter(isReview),selection=/\b(welke|alle|toon|zoek)\b/.test(f)?review:rows;
+  let a=basic('Bronkwaliteit en validatie',`${fmt(review.length)} van ${fmt(rows.length)} bronregels hebben een aandachtspunt voor review of validatie.`,{rows:selection,kv:[['Geselecteerde regels',fmt(rows.length)],['Review of validatie nodig',fmt(review.length)],['Zonder expliciete reviewvlag',fmt(rows.length-review.length)]],items:selection.slice(0,12).map(r=>item((str(r,'activityId')?'Activiteit '+str(r,'activityId'):'Regel '+r.__row),descText(r),source(r),[str(r,'confidence'),str(r,'validation')].filter(Boolean))),followups:['Welke processen hebben veel review nodig?','Toon de bron van deze regels']});a.notes=['Geen reviewvlag is niet hetzelfde als inhoudelijk gevalideerd.'];return addSources(a,selection)
+ }
+ function statsAnswer(q,code,activityId){let m=db.model,c=db.ctx,f=fold(q);let subject=/\b(asset|middelen|werkplek)\b/.test(f)||/\b(daarvan|hiervan|van deze|van die|ervan)\b/.test(f)&&c.lastResponse?.rows?.[0]?.__table?.role==='allocation'?'allocation':/\b(beslisregel|besluit|beslissing)\b/.test(f)?'decisions':'context';let across=/\b(per proces|naar proces|ieder proces|alle processen)\b/.test(f);let rows=activityId&&!across?(subject==='context'?[getCtxActivity(activityId)].filter(Boolean):subject==='decisions'?m.decisions.get(activityId)||[]:m.allocations.get(activityId)||[]):code&&!across?m.fn(code,subject):(m.byRole[subject]?.rows||[]);if(!m.ctx.length&&!code)rows=m.main?.rows||[];
+  if(/\b(daarvan|hiervan|van deze|van die|ervan)\b/.test(f)&&c.lastResponse?.rows?.length&&c.lastResponse.rows[0]?.__table?.role===subject)rows=c.lastResponse.rows;
+  if(subject==='allocation'&&/\b(primair|primaire)\b/.test(f))rows=rows.filter(r=>fold(str(r,'primacy'))==='primair');
+  if(subject==='allocation'&&/\b(secundair|secundaire)\b/.test(f))rows=rows.filter(r=>fold(str(r,'primacy'))==='secundair');
+  if(c.phase&&!across)rows=rows.filter(r=>fold(str(r,'phase'))===c.phase);
+  let dimension=/\b(per fase|naar fase|faseverdeling)\b/.test(f)?'phase':/\b(per rol|naar rol)\b/.test(f)?'actor':/\b(per systeem)\b/.test(f)?'system':across?'processCode':code?'phase':'processCode';
+  if(!m.ctx.length){let hit=/\bper\s+([\w -]{2,45})(?:[?.!]|$)/.exec(f);if(hit){let cc=rows[0]?.__table?.columns.find(c=>key(c)===key(hit[1].trim()));if(cc)dimension=cc}}let grp=new Map();for(let r of rows){let value=(r.__table?.lookup.get(key(dimension))?String(r[r.__table.lookup.get(key(dimension))]??''):str(r,dimension))||'Niet opgegeven';if(dimension==='actor'||dimension==='system'){for(let x of value.split(/[,;|]/)){let v=x.trim();if(v)grp.set(v,(grp.get(v)||0)+1)}}else grp.set(value,(grp.get(value)||0)+1)}let pairs=[...grp].sort((a,b)=>b[1]-a[1]);
+  let unit=subject==='allocation'?'middelenkoppelingen':subject==='decisions'?'beslisregels':'activiteiten';let a=basic('Analyse: '+unit,`${fmt(rows.length)} ${unit} in deze selectie.`,{rows,chart:pairs.slice(0,20),kv:[['Aantal regels',fmt(rows.length)],['Aantal groepen',fmt(pairs.length)]],notes:['Elke bronregel telt één keer, behalve in de uitsplitsing naar rollen of systemen: één activiteit kan meerdere betrokkenen bevatten.'],followups:['Welke groep heeft de meeste regels?','Laat de activiteiten hiervan zien?','Welke regels moeten worden beoordeeld?']});return addSources(a,rows)
+ }
+ function compareAnswer(q,processes){let m=db.model,arr=processes.length?processes:db.ctx.compared||[],a=basic('Procesvergelijking','Vergelijking op grond van de brongegevens.');if(arr.length<2){a.lead='Noem twee procescodes, bijvoorbeeld “Vergelijk A01.1 met A02”.';a.followups=m.codes.length>=2?['Vergelijk '+m.codes[0]+' met '+m.codes[1]]:[];return a}
+  arr=arr.slice(0,5);a.table={headers:['Proces','Activiteiten','Beslisregels','Middelenkoppelingen','Review activiteiten'],rows:arr.map(code=>{let activity=m.fn(code,'context').length?m.fn(code,'context'):m.fn(code,'activities');return [code+' · '+pName(code),activity.length,m.fn(code,'decisions').length,m.fn(code,'allocation').length,activity.filter(r=>/te beoordelen|laag|review/i.test([str(r,'confidence'),str(r,'validation')].join(' '))).length]})};a.rows=arr.flatMap(code=>m.fn(code,'context').slice(0,2));a.followups=['Welke heeft de meeste beslisregels?','Welke systemen komen in beide processen voor?','Welke assets zijn primair?'];return addSources(a,a.rows)
+ }
+ function explainAnswer(){let c=db.ctx,last=c.lastResponse,a=basic('Herkomst en onderbouwing','Er is geen eerdere inhoudelijke uitspraak geselecteerd.');if(!last)return a;
+  a.lead='Het vorige antwoord is gebaseerd op '+fmt(last.rows?.length||0)+' bronregels. De gebruikte regels worden hieronder traceerbaar weergegeven.';a.sources=last.sources||[];a.items=(last.rows||[]).slice(0,6).map(r=>item((r.__sheet||'Bron')+' · rij '+r.__row,descText(r),source(r)));a.notes=['De toepassing heeft geen generatieve redenering. Alle gevolgtrekkingen zijn directe filters, getelde rijen of expliciete relaties uit de bron.'];a.followups=['Welke regels zijn nog te valideren?','Toon de betrokken actoren'];return a
+ }
+ function genericSearch(q,code,actId){let m=db.model,c=db.ctx,terms=words(q).filter(w=>w.length>=3&&!stop.has(w));let quote=/(?:"([^"]{3,})"|'([^']{3,})')/.exec(q);if(quote)terms=words(quote[1]||quote[2]);let rows=actId?[getCtxActivity(actId)].filter(Boolean):code?m.actByProc.get(code)||[]:m.ctx;
+  if(!rows.length)rows=m.main?.rows||[];
+  // Schema-on-read: a sheet or column can be queried without a hardcoded domain model.
+  const tableName=m.tables.filter(t=>t.name.length>=3&&matchWhole(q,t.name)).sort((a,b)=>b.name.length-a.name.length)[0];
+  if(tableName&&!actId)rows=code?(m.byProcess.get(code)?.get(tableName.name)||[]):tableName.rows;
+  if(c.phase)rows=rows.filter(r=>fold(str(r,'phase'))===c.phase);
+  const inferred=rows[0]?.__table;
+  if(inferred){for(let columnName of inferred.columns){if(columnName.length<3||/^(omschrijving|tekst|beschrijving|naam)$/i.test(columnName))continue;
+    let pattern=new RegExp('(?:\\b'+columnName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*(?:=|:|is|met|van)?\\s+)([\\w.\\-]+)','i');let match=pattern.exec(q);
+    if(match&&match[1]&&!['de','het','van','een','alle','per','met','naar','zijn','staat','is','die'].includes(fold(match[1]))){let col=columnName,val=fold(match[1]);let filter=rows.filter(r=>fold(r[col])===val||fold(r[col]).split(/[,;|]/).some(x=>x.trim()===val));if(filter.length){rows=filter;terms=terms.filter(x=>x!==val&&key(x)!==key(col))}}
+  }}
+  if(c.actor)rows=rows.filter(r=>matchWhole(str(r,'actor'),c.actor));if(c.system)rows=rows.filter(r=>matchWhole(str(r,'system'),c.system));if(c.asset){let ids=new Set((m.byRole.allocation?.rows||[]).filter(r=>matchWhole(str(r,'asset'),c.asset)).map(r=>str(r,'activityId')));rows=rows.filter(r=>ids.has(str(r,'activityId')))}
+  const direct=/\b(welke activiteiten|toon activiteiten|laat activiteiten|welke stappen|toon stappen)\b/.test(fold(q));
+  if(terms.length&&!direct){let rank=rows.map(r=>{let d=fold([str(r,'text'),str(r,'stepName'),str(r,'actor'),str(r,'system'),str(r,'processName')].join(' ')),hits=terms.filter(t=>d.includes(t)).length;return {r,hits}}).filter(x=>x.hits).sort((a,b)=>b.hits-a.hits||Number(get(a.r,'activityId'))-Number(get(b.r,'activityId')));rows=rank.map(x=>x.r)}
+  if(rows.length===1)c.activity=str(rows[0],'activityId');let a=basic('Zoekresultaten',rows.length?`${fmt(rows.length)} bronregels voldoen aan de herkende zoektermen.`:'Geen passende bronregels gevonden.',{rows,items:rows.slice(0,10).map(r=>m.ctx.includes(r)?describeActivity(r):item(r.__sheet+' · rij '+r.__row,descText(r),source(r))),followups:['Welke rol hoort hierbij?','Welke systemen zijn betrokken?','Welke assets horen hierbij?']});
+  if(!rows.length)a.warnings.push('De vraag valt buiten de herkende patronen of de bron bevat geen overeenkomende gegevens. Er is niets ingevuld op basis van aannames.');
+  if(terms.length)a.notes.push('Herkende zoektermen: '+terms.slice(0,9).join(', ')+'.');return addSources(a,rows)
+ }
+ function definitionAnswer(q){let m=db.model,rows=m.byRole.definitions?.rows||[],f=fold(q),matches=rows.map(r=>{let term=String(r['Begrip']||''),syn=String(r['Synoniemen/zoekwoorden']||'').split(/[,;|]/),hits=[term,...syn].filter(x=>x.length>=3&&matchWhole(f,x)).length;return {r,hits}}).filter(x=>x.hits).sort((a,b)=>b.hits-a.hits);let a=basic('Begrippen en definities',matches.length?'Definities uit het begrippenregister van de werkmap.':'Er is geen passende definitie in het begrippenregister gevonden.',{rows:matches.map(x=>x.r),items:matches.slice(0,8).map(x=>item(x.r['Begrip'],x.r['Definitie voor chatbot']||x.r['Voluit/categorie']||'',source(x.r),x.r['Niet verwarren met']?['Niet verwarren met: '+x.r['Niet verwarren met']]:[])),followups:['Welke processen gebruiken dit begrip?','Welke bron hoort bij deze definitie?']});if(!matches.length)a.warnings.push('Een definitie kan niet betrouwbaar worden afgeleid zonder expliciete bron.');return addSources(a,a.rows)}
+ function networkAnswer(q,code,id){let m=db.model,c=db.ctx,r=getCtxActivity(id||c.activity);if(!r)return basic('Relatieoverzicht','Kies één activiteit-ID om de relaties op te halen.',{followups:['Wat is de eerste activiteit van '+(code||m.codes[0]||'het proces')+'?']});
+  let actid=str(r,'activityId'),alloc=m.allocations.get(actid)||[],dec=m.decisions.get(actid)||[],actors=str(r,'actor'),systems=str(r,'system'),next=str(r,'nextId'),prev=str(r,'prevId'),alt=str(r,'altId');
+  let a=basic('Relatienetwerk van activiteit '+actid,str(r,'text'),{rows:[r,...dec,...alloc],kv:[['Proces',str(r,'processCode')],['ABC-fase',str(r,'phase')],['Subfase',str(r,'subphase')],['Actoren',actors||'Niet opgegeven'],['Systemen',systems||'Niet opgegeven'],['Gekoppelde assetregels',String(alloc.length)],['Beslisregels',String(dec.length)],['Vorige bronactiviteit',prev||'Niet vastgelegd'],['Volgende bronactiviteit',next||'Niet vastgelegd'],['Alternatief vervolg',alt||'Niet vastgelegd']],items:[...alloc.slice(0,5).map(x=>item('Asset: '+str(x,'asset'),str(x,'role'),source(x))),...dec.slice(0,5).map(x=>item('Voorwaarde: '+str(x,'condition'),'DAN: '+str(x,'nextId')+' · ANDERS: '+str(x,'altId'),source(x)))],notes:['Alle koppelingen zijn gebaseerd op gedeelde activiteit-ID’s. Ontbrekende relaties zijn niet aangevuld.'],followups:['Welke assets zijn primair?','Welke beslisregels zijn verbonden?','Wat gebeurt er daarna?']});return addSources(a,a.rows)
+ }
+ function responsibilityAnswer(q,code,id){let m=db.model,mentions=[],registry=[...(m.byRole.actors?.rows||[]),...(m.byRole.systems?.rows||[])];for(let r of registry){let name=String(r['Actor']||r['Systeem']||'');if(name.length>=2&&matchWhole(q,name)&&!mentions.some(x=>x.name===name))mentions.push({name,kind:r.__table?.role==='systems'?'Technisch systeem':'Actor/rol',row:r})}
+  let a=basic('Wie beslist?','Een systeem en een actor hebben een verschillende rol. Een besluitbevoegdheid volgt alleen uit een expliciete procesregel.',{rows:mentions.map(x=>x.row),items:mentions.map(x=>item(x.name,x.kind+(x.kind==='Technisch systeem'?' · geen menselijke beslisser':' · bevoegdheid afhankelijk van de processtap'),source(x.row))),followups:['Welke beslisregels zijn hiervoor vastgelegd?','Welke actor is bij deze activiteit betrokken?']});
+  if(!code&&!id)a.warnings.push('Zonder een proces en concrete beslisactiviteit is niet vast te stellen wie dit besluit neemt.');
+  else{let rules=id?m.decisions.get(String(id))||[]:m.fn(code,'decisions');a.rows.push(...rules.slice(0,5));a.notes.push(fmt(rules.length)+' beslisregels zijn binnen de processelectie beschikbaar om dit te controleren.')}return addSources(a,a.rows)
+ }
+ function safetyAnswer(q,code){let a=basic('Onvoldoende context voor een uitvoeringsbesluit','Ik kan geen ja/nee-besluit geven zonder een toepasselijke, gevalideerde beslisregel.',{warnings:['Geef eerst het verstoringstype, de locatie, de actuele situatie, risico’s voor mensen en de genomen maatregelen.'],followups:['Welke beslisregels horen bij '+(code||'dit proces')+'?','Welke actor mag hierover besluiten?']});if(code){let rr=db.model.fn(code,'decisions');a.notes.push('In '+code+' zijn '+fmt(rr.length)+' beslisregels beschikbaar. Een uitvoeringsbesluit vereist de toepasselijke conditie en validatiestatus.');a.sources=sourceRows(rr)}return a
+ }
+ function findActivityQuoted(q,code){let mt=/[‘“"']([^‘’“”"']{12,220})[’”"']/.exec(q);if(!mt)return null;let needle=fold(mt[1]).replace(/\s+/g,' ').trim(),rows=code?db.model.actByProc.get(code)||[]:db.model.ctx;let match=rows.filter(r=>fold(str(r,'text')).includes(needle));return match.length===1?match[0]:null}
+ function genericAnswer(q){let m=db.model,f=fold(q),target=m.tables.filter(t=>t.name.length>=2&&matchWhole(q,t.name)).sort((a,b)=>b.name.length-a.name.length)[0]||m.main;
+  if(!target)return basic('Geen tabel beschikbaar','Het bronbestand bevat geen tabel die kan worden bevraagd.');
+  let rows=target.rows.slice(),selected=[],cols=target.columns;
+  for(let col of cols){let escaped=col.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');let pattern=new RegExp('(?:^|\\b)'+escaped+'\\s*(?:=|:|is|met|van|gelijk aan)?\\s+([\\w.\\-/]+)','i'),hit=pattern.exec(q);
+   if(!hit)continue;let term=String(hit[1]).toLowerCase();if(['de','het','een','alle','per','met','naar','zijn','staat','is','die','welke','wat','hoeveel','moet','groter','hoger','lager','kleiner','boven','onder','dan','gemiddeld','gemiddelde'].includes(term))continue;
+   let matching=rows.filter(r=>fold(r[col])===term||fold(r[col]).split(/[,;|]/).some(x=>x.trim()===term));if(matching.length){rows=matching;selected.push(col+' = '+term)}
+   let compare=new RegExp('(?:^|\\b)'+escaped+'\\s+(?:(?:is|moet)\\s+)?(boven|onder|groter dan|hoger dan|lager dan|kleiner dan|meer dan|minder dan|[><=])\\s*([\\d.,-]+)','i').exec(q);
+   if(compare){let n=toNum(compare[2]),op=fold(compare[1]);if(n!==null){rows=rows.filter(r=>{let x=toNum(r[col]);return x!==null&&(op==='>'||op==='boven'||op==='groter dan'||op==='hoger dan'||op==='meer dan'?x>n:op==='<'||op==='onder'||op==='lager dan'||op==='kleiner dan'||op==='minder dan'?x<n:x===n)});selected.push(col+' '+op+' '+n)}}
+  }
+  for(let col of cols){let re=new RegExp('(?:^|\\b)'+col.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s+(?:is\\s+)?(boven|onder|groter dan|hoger dan|lager dan|kleiner dan|meer dan|minder dan|[><=])\\s*([\\d.,-]+)','i');let found=re.exec(q);if(!found)continue;let op=fold(found[1]),limit=toNum(found[2]);if(limit===null)continue;rows=rows.filter(r=>{let value=toNum(r[col]);return value!==null&&(op==='>'||['boven','groter dan','hoger dan','meer dan'].includes(op)?value>limit:op==='<'||['onder','lager dan','kleiner dan','minder dan'].includes(op)?value<limit:value===limit)});selected.push(col+' '+op+' '+limit)}
+  let name=target.name,numberCols=cols.filter(c=>target.rows.some(r=>typeof r[c]==='number')),groupBy=null;
+  for(let col of cols){let pat=new RegExp('\\b(?:per|naar|groepeer op|groepeer per)\\s+'+col.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?=$|[^a-z0-9])','i');if(pat.test(q)){groupBy=col;break}}
+  let numeric=numberCols.find(c=>new RegExp('\\b'+c.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i').test(q))||(numberCols.length===1?numberCols[0]:null);
+  let nSort=/(?:top\s*(\d+)|eerste\s*(\d+))/i.exec(q),limit=nSort?Math.min(100,Number(nSort[1]||nSort[2])):12;
+  if(groupBy){let grp=new Map();for(let r of rows){let val=String(r[groupBy]??'Niet ingevuld');grp.set(val,(grp.get(val)||0)+1)}let pairs=[...grp].sort((a,b)=>b[1]-a[1]);let a=basic('Groepering: '+groupBy,`${fmt(rows.length)} regels uit ${name}, verdeeld over ${fmt(pairs.length)} groepen.`,{rows,chart:pairs.slice(0,30),kv:[['Tabblad',name],['Groepering',groupBy],['Regels',fmt(rows.length)]],notes:selected.length?['Toegepaste filters: '+selected.join('; ')]:[],followups:['Toon alle regels uit '+name,'Hoeveel regels per '+groupBy+'?']});return addSources(a,rows)}
+  let agg=/\b(gemiddelde|gemiddeld|som van|optelling|totaal van|minimale|minimum|maximum|maximale|hoogste|laagste)\b/i.exec(q);
+  if(agg&&numeric){let vals=rows.map(r=>toNum(r[numeric])).filter(x=>x!==null),sum=vals.reduce((a,b)=>a+b,0),count=vals.length;let avg=count?sum/count:null,min=count?Math.min(...vals):null,max=count?Math.max(...vals):null;let a=basic('Berekening: '+numeric,`Berekend uit ${fmt(count)} numerieke waarden van tabblad ${name}.`,{rows,kv:[['Aantal waarden',fmt(count)],['Som',count?String(Number(sum.toFixed(8))):'Geen waarden'],['Gemiddelde',avg!==null?String(Number(avg.toFixed(8))):'Geen waarden'],['Minimum',min!==null?String(min):'Geen waarden'],['Maximum',max!==null?String(max):'Geen waarden']],notes:selected.length?['Filters: '+selected.join('; ')]:[],followups:['Toon alle regels uit '+name,'Hoeveel regels zijn er?']});return addSources(a,rows)}
+  let sortMatch=/\b(?:sorteer|sorteren|rangschik)(?: op| naar)?\s+(.+?)(?:\s+(?:aflopend|oplopend))?[?.!]?$/.exec(f);if(sortMatch){let sorter=cols.find(c=>key(sortMatch[1]).includes(key(c)));if(sorter){rows.sort((a,b)=>{let aa=a[sorter],bb=b[sorter];return typeof aa==='number'&&typeof bb==='number'?aa-bb:String(aa??'').localeCompare(String(bb??''),'nl',{numeric:true})});if(/aflopend/.test(f))rows.reverse()}}
+  let a=basic('Resultaten uit '+name,`${fmt(rows.length)} ${rows.length===1?'regel':'regels'} in de geselecteerde tabel${selected.length?' na filteren':''}.`,{rows,items:rows.slice(0,limit).map(r=>item(cols.slice(0,2).map(c=>String(r[c]??'')).filter(Boolean).join(' · ')||'Rij '+r.__row,cols.slice(2,8).map(c=>`${c}: ${String(r[c]??'')}`).filter(x=>!x.endsWith(': ')).join('\n'),source(r))),kv:[['Tabblad',name],['Regels gevonden',fmt(rows.length)]],notes:selected.length?['Toegepaste filters: '+selected.join('; ')]:[],followups:['Welke tabellen bevat het bestand?','Hoeveel regels per '+(cols.find(c=>!numberCols.includes(c))||cols[0])+'?']});
+  if(!rows.length)a.warnings.push('Geen resultaten voor de opgegeven filterwaarden.');return addSources(a,rows)
+ }
+ function resolveFollowup(q,explicitCodes){let c=db.ctx,f=fold(q),standalone=/^(en |hoe zit het met|wat (dan|daarna)|wie (dan|daar)|en (welke|wat)|waarom dat|hoeveel daarvan|en die|dezelfde vraag|daarvan)/.test(f),short=q.trim().split(/\s+/).length<=5;
+  let kind=intentOf(q);
+  if(explicitCodes.length===1&&standalone&&short&&!/\b(vergelijk|verschil)\b/.test(f)){if(c.lastIntent&&!['why','overview','processes','more','compare','help'].includes(c.lastIntent))kind=c.lastIntent}
+  if(c.lastIntent==='assets'&&/\b(primair|primaire|secundair|secundaire)\b/.test(f))kind=/\b(hoeveel|aantal|tel)\b/.test(f)?'stats':'assets';
+  if(c.lastIntent==='decision'&&/\b(deze|die|hiervan|daarvan)\b/.test(f)&&/\b(valideren|validatie|review|onzeker|kwaliteit)\b/.test(f))kind='quality';
+  if(/\b(hoeveel daarvan|hoeveel van die|aantal daarvan)\b/.test(f)&&!(c.lastIntent==='assets'&&/\b(primair|primaire|secundair|secundaire)\b/.test(f)))kind='countLast';
+  if(/\b(die activiteit|deze activiteit|die stap|deze stap)\b/.test(f)&&kind==='search')kind='process';
+  if(/\b(waar zijn ze|waar staan ze)\b/.test(f))kind='why';
+  return kind;
+ }
+ function countLast(){let c=db.ctx,rows=c.lastResponse?.rows||[];return basic('Aantal binnen vorige selectie',`${fmt(rows.length)} regels zijn opgenomen in de vorige selectie.`,{rows,notes:['De telling gebruikt dezelfde selectie als het voorgaande antwoord.'],sources:sourceRows(rows),followups:['Welke zijn dat?','Welke hiervan moeten beoordeeld worden?']})}
+ function more(){let c=db.ctx,prev=c.lastResponse;if(!prev||!prev.rows||!prev.rows.length)return basic('Geen vervolgresultaten','Er is nog geen zoekresultaat om verder te tonen.');let start=c.pageOffset;c.pageOffset=start+10;let rows=prev.rows.slice(start,start+10),a=basic('Meer uit de vorige selectie',rows.length?`Regels ${start+1} t/m ${start+rows.length} van ${fmt(prev.rows.length)}.`:'Alle resultaten zijn al getoond.',{items:rows.map(r=>db.model.ctx.includes(r)?describeActivity(r):item(r.__sheet+' · rij '+r.__row,descText(r),source(r))),rows:prev.rows,followups:start+10<prev.rows.length?['Toon meer resultaten']:['Welke rollen zijn betrokken?']});return addSources(a,rows)}
+ function ask(raw,{dry=false}={}){if(!db.model)throw Error('Laad eerst een Excelbestand.');let snapshot=dry?structuredClone({ctx:db.ctx}):null;
+  const run=()=>{let q=String(raw||'').trim().slice(0,2000),c=db.ctx,m=db.model,explicitCodes=resolveProcess(q),kind=resolveFollowup(q,explicitCodes),id=extractActivity(q),phase=resolvePhase(q),process=explicitCodes.length===1?explicitCodes[0]:c.process;
+   if(explicitCodes.length===1&&process!==c.process){c.process=process;c.activity=null;c.actor=null;c.system=null;c.asset=null;c.phase=null;c.lastRows=[]}
+   if(explicitCodes.length>=2){c.compared=explicitCodes.slice();if(kind!=='compare')kind='compare'}
+   if(id){c.activity=id;let found=getCtxActivity(id);if(found&&!explicitCodes.length){process=str(found,'processCode').toUpperCase()||process;c.process=process}}
+   if(!id){let quoted=findActivityQuoted(q,process);if(quoted){id=str(quoted,'activityId');c.activity=id;if(!process){process=str(quoted,'processCode').toUpperCase();c.process=process}}}
+   if(phase)c.phase=phase;
+   let phrase=fold(q);
+   if(/\b(alle fasen|zonder fasefilter|alle fases)\b/.test(phrase))c.phase=null;
+   if(/\b(zonder filters|wis filters|alle rollen en systemen|reset context)\b/.test(phrase)){c.actor=null;c.system=null;c.asset=null;c.phase=null}
+   if(/\b(?:van|over|voor) (dit|deze|het) proces\b/.test(phrase)&&!process&&m.codes.length===1){process=m.codes[0];c.process=process}
+   if(/\b(dit|deze|die) activiteit\b/.test(phrase)&&!id)id=c.activity;
+   if(/\b(activiteit|stap)\b/.test(phrase)&&!id&&kind==='sequence'&&c.activity)id=c.activity;
+   if(kind==='search'&&/^(a\d|b\d|c\d|d\d)/i.test(q.trim())&&explicitCodes.length===1)kind='process';
+   if(/\b(alleen de rol|voor de rol)\b/.test(phrase)){let who=detectName(q,'actor','actors');if(who)c.actor=who}
+   if(/\b(alleen.*systeem|voor systeem)\b/.test(phrase)){let system=detectName(q,'system','systems');if(system)c.system=system}
+   if(/\b(asset|middelen)\b/.test(phrase)){let reg=detectName(q,'asset','assets');if(reg&&/\b(alleen|specifiek|voor asset|asset )\b/.test(phrase))c.asset=reg}
+   let a;
+   if(!m.ctx.length&&!m.codes.length&& !['overview','help','definition','why','more','countLast'].includes(kind)){a=genericAnswer(q)}
+   else switch(kind){
+    case 'help':a=basic('Wat kun je vragen?','Je kunt vragen stellen over procesvolgorde, actoren, systemen, middelen, besliscondities, fasen, tellingen en bronkwaliteit.',{items:[item('Context meenemen','Voorbeeld: “Wat is de eerste activiteit van A01.1?” gevolgd door “Wie voert dat uit?”, “Wat komt daarna?” en “Welke assets horen erbij?”'),item('Brongebonden antwoorden','De chatbot vindt rijen, volgt bron-ID’s en toont waar de gegevens staan. Ontbrekende of ongeldige relaties worden niet aangevuld.')],followups:['Welke processen staan erin?','Wat is de eerste activiteit van '+(m.codes[0]||'dit proces')+'?']});break;
+    case 'overview':a=overview();break;
+    case 'definition':a=definitionAnswer(q);break;
+    case 'network':a=networkAnswer(q,process,id);break;
+    case 'responsibility':a=responsibilityAnswer(q,process,id);break;
+    case 'safety':a=safetyAnswer(q,process);break;
+    case 'processes':a=processList(q);break;
+    case 'process':a=process?processDetail(process):genericSearch(q,process,id);break;
+    case 'sequence':a=stepAnswer(q,process,id||c.activity);break;
+    case 'actors':a=actorAnswer(q,process,id||(/\b(die|deze|hierbij|daarbij|erbij|hiervan|daarvan|daaraan|eraan|dit|dat)\b/.test(phrase)?c.activity:null));break;
+    case 'systems':a=systemAnswer(q,process,id||(/\b(die|deze|hierbij|daarbij|erbij|hiervan|daarvan|daaraan|eraan|dit|dat)\b/.test(phrase)?c.activity:null));break;
+    case 'assets':{let repeat=!id&& !explicitCodes.length&&c.lastIntent==='assets'&&/\b(welke zijn|primair|primaire|secundair|secundaire|hiervan|daarvan|van die|deze)\b/.test(phrase)&&c.lastResponse?.rows?.[0]?.__table?.role==='allocation';a=assetAnswer(q,process,id||(!repeat&&/\b(die|deze|hierbij|daarbij|erbij|hiervan|daarvan|daaraan|eraan|dit|dat|gekoppeld|activiteit)\b/.test(phrase)?c.activity:null),repeat?c.lastResponse.rows:null);break;}
+    case 'decision':a=decisionAnswer(q,process,id||(/\b(die|deze|hierbij|daarbij|erbij|hiervan|daarvan|daaraan|eraan|dit|dat)\b/.test(phrase)?c.activity:null));break;
+    case 'activities':a=activitiesAnswer(q,process,id,phase||c.phase);break;
+    case 'phase':a=phaseAnswer(q,process,id||(/\b(die|deze|hierbij|daarbij|erbij|hiervan|daarvan|daaraan|eraan|dit|dat)\b/.test(phrase)?c.activity:null));break;
+    case 'quality':a=qualityAnswer(q,process,id);break;
+    case 'stats':a=statsAnswer(q,process,id);break;
+    case 'compare':a=compareAnswer(q,explicitCodes);break;
+    case 'why':a=explainAnswer();break;
+    case 'more':a=more();break;
+    case 'countLast':a=countLast();break;
+    default:a=genericSearch(q,process,id);break;
+   }
+   a.kind=kind;a.query=q;
+   if(!['more','why','countLast'].includes(kind)){c.lastIntent=kind;c.pageOffset=a.items?.length||0;c.lastRows=a.rows||[];c.lastSheet=a.rows?.[0]?.__sheet||null;c.lastResponse={kind,title:a.title,rows:a.rows||[],sources:a.sources||[]};}
+   if(!dry)c.history.push({question:q,answer:a.title,count:a.rows?.length||0,timestamp:new Date().toISOString()});
+   return a;
+  };
+  let answer=run();if(dry)db.ctx=snapshot.ctx;return answer;
+ }
+ function testSuite(onStatus){let t=db.model?.byRole.tests;if(!t?.rows?.length)return {available:false};let tests=t.rows,correct=0,skipped=0,results=[],savedCtx=db.ctx,codeChecked=0,codePassed=0,refChecked=0,refPassed=0;let max=tests.length;
+  for(let i=0;i<max;i++){db.ctx=emptyContext();let r=tests[i],q=String(r['Gebruikersvraag']||''),expectedCode=String(r['Bedoelde procescode']||'').toUpperCase(),ref=String(r['Referentie activiteit-ID']||'').trim();if(!q){skipped++;continue}
+   try{let a=ask(q,{dry:false}),evidence=(a.rows||[]).some(x=>str(x,'processCode').toUpperCase()===expectedCode)||db.ctx.process===expectedCode||a.items?.some(x=>x.title.includes(expectedCode));let refOk=!ref||a.rows.some(x=>str(x,'activityId')===ref),codeOk=!expectedCode||evidence;if(expectedCode){codeChecked++;if(codeOk)codePassed++}if(ref){refChecked++;if(refOk)refPassed++}let ok=codeOk&&refOk;
+    if(ok)correct++;results.push({id:r['Test-ID']||r.__row,query:q,expected:expectedCode,expectedRef:ref,found:db.ctx.process||'',foundRef:a.rows.slice(0,4).map(x=>str(x,'activityId')).filter(Boolean).join(', '),codeOk,refOk,passed:ok,detail:ok?'Traceerbaar':'Proces of activiteit niet aangetoond'});
+   }catch(e){results.push({id:r['Test-ID']||r.__row,query:q,expected:expectedCode,found:'-',passed:false,detail:e.message})}
+   if(i%25===0)onStatus?.(i,max)
+  }
+  db.ctx=savedCtx;return {available:true,checked:results.length,passed:correct,failed:results.length-correct,skipped,codeChecked,codePassed,refChecked,refPassed,results,note:'Dit is een deterministische controle op procescodes en expliciete activiteitverwijzingen. De tests beoordelen niet of de inhoudelijke uitkomst, de rolverdeling of de beslisregel operationeel juist is.'};
+ }
+ return {init,reset,ask,model:()=>db.model,context:()=>db.ctx,ctxInfo,source,get,str,fmt,testSuite};
+})();
+
+'use strict';
+const UI=(()=>{
+ const $=id=>document.getElementById(id),ui={messages:[],busy:false};
+ const el=(tag,klass,text)=>{let d=document.createElement(tag);if(klass)d.className=klass;if(text!==undefined)d.textContent=String(text);return d};
+ const add=(p,tag,klass,text)=>{let d=el(tag,klass,text);p.appendChild(d);return d};
+ const clear=p=>p.replaceChildren();
+ const chip=(p,label,query)=>{let b=add(p,'button','chip',label);b.type='button';b.addEventListener('click',()=>send(query||label));return b};
+ const scroll=()=>{let c=$('chatScroll');requestAnimationFrame(()=>c.scrollTop=c.scrollHeight)};
+ const progress=(percent,msg)=>{$('progress').classList.remove('hide');$('progressBar').style.width=percent+'%';$('loadDetail').textContent=msg};
+ const softStatus=(text,good)=>{$('stateText').textContent=text;$('stateDot').className='dot '+(good?'good':'warn')};
+ function updateContext(){let c=Engine.context(),box=$('contextPanel');clear(box);if(!Engine.model()){add(box,'strong','','Nog geen Excel geladen');add(box,'p','','Begin met een lokaal Excelbestand.');return}
+  if(!c.process&&!c.activity&&!c.phase&&!c.lastIntent){add(box,'strong','','Nog geen proces gekozen');add(box,'p','','Stel je eerste vraag. Proces- en activiteitscontext worden in het gesprek onthouden.');return}
+  for(let [label,value] of [['Proces',c.process],['Activiteit-ID',c.activity],['Fasefilter',c.phase],['Actorfilter',c.actor],['Systeemfilter',c.system],['Assetfilter',c.asset],['Laatste vraagtype',c.lastIntent]]){if(value===null||value===undefined||value==='')continue;let d=add(box,'div','ctx-field');add(d,'small','',label);add(d,'span','',value)}
+  $('composerContext').textContent='Context: '+[c.process?'proces '+c.process:null,c.activity?'activiteit '+c.activity:null,c.phase?'fase '+c.phase:null].filter(Boolean).join(' · ')||'Geen actieve context';
+ }
+ function updateSuggestions(answer){let p=$('rightSuggestions');clear(p);let arr=answer?.followups?.slice(0,5)||[];if(!arr.length){arr=['Welke processen staan erin?','Welke activiteiten zijn er?','Hoeveel assets per proces?']}arr.forEach(x=>chip(p,x));}
+ function setModel(model,file){$('fileLabel').textContent=file.name;$('topSub').textContent=Engine.fmt(model.totalRows)+' regels in '+model.tables.length+' tabbladen';$('loadDetail').textContent=(file.size/(1024*1024)).toFixed(1)+' MB · lokaal ingelezen';$('progress').classList.add('hide');softStatus('Datamodel gereed',true);
+  $('kSheets').textContent=Engine.fmt(model.tables.length);$('kRows').textContent=Engine.fmt(model.totalRows);$('kProcesses').textContent=Engine.fmt(model.codes.length);$('kLinks').textContent=Engine.fmt(model.linkCount);
+  for(let id of ['overviewBtn','exploreBtn'])$(id).disabled=false;$('testBtn').disabled=!model.byRole.tests;
+  let list=$('sheetList');clear(list);for(let t of model.tables){let b=add(list,'button','sheet');b.append(el('span','',t.name));b.append(el('span','count',Engine.fmt(t.rows.length)));b.addEventListener('click',()=>openExplore(t.name))}
+  let wel=$('welcome');if(wel)wel.remove();addBot({title:'Bestand geladen',lead:`${file.name} bevat ${Engine.fmt(model.totalRows)} gegevensregels in ${model.tables.length} tabbladen. ${model.codes.length?'Ik heb '+Engine.fmt(model.codes.length)+' procescodes herkend.':'Er zijn geen expliciete procescodes herkend, maar zoeken en tellen in tabellen blijft beschikbaar.'}`,kv:[['Activiteiten',Engine.fmt(model.ctx.length)],['Beslisregels',Engine.fmt(model.byRole.decisions?.rows.length||0)],['Middelenkoppelingen',Engine.fmt(model.byRole.allocation?.rows.length||0)]],notes:['Het bestand is alleen binnen deze browsersessie beschikbaar. Er vindt geen serverupload plaats.'],followups:['Welke processen staan erin?','Wat is de eerste activiteit van '+(model.codes[0]||'het proces')+'?','Welke beslisregels zijn nog te valideren?']});updateContext()}
+ async function load(file){if(!file)return;if(ui.busy)return;ui.busy=true;$('sendBtn').disabled=true;$('loadBtn').disabled=true;
+  try{progress(1,'Lokale spreadsheet wordt gelezen');let sheets=await ExcelReader.readFile(file,progress);if(!sheets.length)throw Error('Geen leesbare tabbladen gevonden');let model=Engine.init(sheets);ui.messages=[];clear($('chatInner'));setModel(model,file)}
+  catch(e){progress(0,'Kan bestand niet laden');softStatus('Fout bij het inlezen',false);addBot({title:'Import mislukt',lead:String(e.message||e),warnings:['Controleer of dit een geldig Excelbestand is en probeer het opnieuw. Het bestand is niet verzonden.'],followups:[]});console.error('Lokale importfout:',e)}
+  finally{ui.busy=false;$('sendBtn').disabled=false;$('loadBtn').disabled=false;setTimeout(()=>$('progress').classList.add('hide'),600);scroll()}
+ }
+ function addUser(text){let wrap=add($('chatInner'),'div','rowmsg user'),av=add(wrap,'div','avatar','JIJ'),bubble=add(wrap,'div','bubble',text);return wrap}
+ function addBot(ans){let wrap=add($('chatInner'),'div','rowmsg bot');add(wrap,'div','avatar','PN');let inner=add(wrap,'div','bubble'),d=add(inner,'div','answer');
+  if(ans.title)add(d,'h3','',ans.title);if(ans.lead)add(d,'p','',ans.lead);
+  if(ans.kv?.length){let k=add(d,'dl','kv');for(let [name,value] of ans.kv){add(k,'dt','',name);add(k,'dd','',value)}}
+  if(ans.warnings?.length)for(let w of ans.warnings)add(d,'div','soft-alert',w);
+  if(ans.items?.length){let list=add(d,'div','result-list');for(let entry of ans.items){let block=add(list,'div','result-item');add(block,'div','headline',entry.title||'Resultaat');if(entry.body)add(block,'p','result-body',entry.body);if(entry.tags?.length){let tg=add(block,'div','tags');tg.style.marginTop='7px';entry.tags.slice(0,7).forEach(s=>add(tg,'span','tag',s))}if(entry.meta)add(block,'div','meta',entry.meta)}if(ans.items.length&&ans.rows?.length>ans.items.length)add(d,'p','ellipsis',`Er zijn ${Engine.fmt(ans.rows.length)} regels gevonden. De eerste ${ans.items.length} zijn getoond. Vraag “toon meer resultaten” voor de volgende regels.`)}
+  if(ans.table?.headers?.length){let scrollArea=add(d,'div','table-scroll'),table=add(scrollArea,'table','data-table'),head=add(table,'thead'),thr=add(head,'tr');for(let h of ans.table.headers)add(thr,'th','',h);let body=add(table,'tbody');for(let row of ans.table.rows){let tr=add(body,'tr');for(let cell of row)add(tr,'td','',cell)}}
+  if(ans.chart?.length){let chart=add(d,'div','mini-chart'),max=Math.max(1,...ans.chart.map(x=>x[1]));for(let [label,count] of ans.chart.slice(0,20)){let line=add(chart,'div','barrow');add(line,'span','',label).title=label;let bg=add(line,'div','bar-bg'),bar=add(bg,'div','bar-fg');bar.style.width=Math.max(1,100*count/max)+'%';add(line,'b','',Engine.fmt(count))}}
+  if(ans.notes?.length)for(let note of ans.notes)add(d,'p','note',note);
+  if(ans.sources?.length){let p=add(d,'div','sources');for(let s of ans.sources)add(p,'span','source',s)}
+  if(ans.followups?.length){let p=add(d,'div','chips');for(let suggest of ans.followups.slice(0,6))chip(p,suggest)}
+  scroll();return wrap;
+ }
+ function send(input){let q=String(input??$('question').value).trim();if(!q)return;$('question').value='';$('question').style.height='auto';$('welcome')?.remove();addUser(q);
+  if(!Engine.model()){addBot({title:'Laden vereist',lead:'Selecteer eerst een XLS, XLSX of CSV-bestand. Daarna kan ik vragen beantwoorden op grond van de gegevens.',followups:[]});return}
+  try{let response=Engine.ask(q);addBot(response);ui.messages.push({role:'user',text:q},{role:'assistant',title:response.title,text:response.lead,items:response.items,sources:response.sources,timestamp:new Date().toISOString()});updateContext();updateSuggestions(response)}
+  catch(e){console.error(e);addBot({title:'Vraag niet verwerkt',lead:e.message,warnings:['Er is geen antwoord ingevuld wanneer de verwerking faalt. Probeer een specifiekere vraag.']})}
+  $('question').focus();
+ }
+ const hideModal=()=>$('modalOverlay').classList.remove('show');
+ function showModal(title,sub){$('modalTitle').textContent=title;$('modalSub').textContent=sub||'';clear($('modalBody'));$('modalOverlay').classList.add('show');return $('modalBody')}
+ function openExplore(sheetName){let m=Engine.model();if(!m)return;let table=m.tables.find(t=>t.name===sheetName)||m.tables[0],panel=showModal('Tabellen verkennen','Gegevens komen rechtstreeks uit het lokale Excelbestand.');
+  let chooser=add(panel,'select','input');for(let t of m.tables){let opt=add(chooser,'option','',`${t.name} (${Engine.fmt(t.rows.length)})`);opt.value=t.name}chooser.value=table.name;
+  let search=add(panel,'input','input');search.placeholder='Zoeken binnen dit tabblad';search.style.margin='0 0 0 9px';search.style.minWidth='240px';
+  let line=add(panel,'p','small'),target=add(panel,'div','table-scroll');
+  const repaint=()=>{table=m.tables.find(t=>t.name===chooser.value);let term=search.value.trim().toLowerCase(),rows=term?table.rows.filter(r=>Object.values(r).some(v=>String(v??'').toLowerCase().includes(term))):table.rows;line.textContent=`${Engine.fmt(rows.length)} van ${Engine.fmt(table.rows.length)} regels · koprij ${table.headerRow} · eerste 80 zichtbaar`;clear(target);let t=add(target,'table','data-table'),th=add(t,'thead'),tr=add(th,'tr');add(tr,'th','','Rij');for(let col of table.columns.slice(0,18))add(tr,'th','',col);let tb=add(t,'tbody');for(let r of rows.slice(0,80)){let rr=add(tb,'tr');add(rr,'td','',r.__row);for(let col of table.columns.slice(0,18))add(rr,'td','',String(r[col]??''))}}
+  chooser.addEventListener('change',repaint);search.addEventListener('input',repaint);repaint()}
+ function openTest(){let m=Engine.model();if(!m)return;let modal=showModal('Regressiecontrole','Controle op procesherkenning en bron-ID’s, zonder AI.');add(modal,'p','small','Het bestand kan meer testvragen bevatten. Alle beschikbare testvragen worden gecontroleerd.');let button=add(modal,'button','btn primary','Testvragen uitvoeren');let target=add(modal,'div','');button.addEventListener('click',()=>{button.disabled=true;button.textContent='Testcontrole loopt';setTimeout(()=>{try{let r=Engine.testSuite();clear(target);if(!r.available){add(target,'p','','Dit bestand heeft geen tabblad met testvragen.');return}add(target,'h3','',`${Engine.fmt(r.checked)} testvragen gecontroleerd`);add(target,'p','',`Procescode herkend: ${Engine.fmt(r.codePassed)} van ${Engine.fmt(r.codeChecked)}. Activiteit-ID aangetoond: ${Engine.fmt(r.refPassed)} van ${Engine.fmt(r.refChecked)}.`);add(target,'p','small',r.note);add(target,'p','small','Eerst worden maximaal 200 afwijkingen getoond.');let result=add(target,'div','table-scroll'),tb=add(result,'table','data-table'),head=add(tb,'tr');for(let h of ['Test','Status','Proces','Activiteit-ID','Vraag'])add(head,'th','',h);for(let item of [...r.results.filter(x=>!x.passed),...r.results.filter(x=>x.passed)].slice(0,200)){let tr=add(tb,'tr');for(let value of [item.id,item.passed?'OK':'Nader controleren',item.expected+' / '+item.found,(item.expectedRef||'-')+' / '+(item.foundRef||'-'),item.query])add(tr,'td','',value)}}catch(e){add(target,'p','',e.message)}finally{button.disabled=false;button.textContent='Opnieuw testen'}},15)})}
+ function clearConversation(){Engine.reset();clear($('chatInner'));ui.messages=[];addBot({title:'Nieuwe conversatie',lead:Engine.model()?'Het bronbestand blijft geladen. De proces-, activiteit- en filtercontext zijn gewist.':'Er is nog geen bestand geladen.',followups:Engine.model()?['Welke processen staan erin?','Wat is de eerste activiteit?']:[]});updateContext();updateSuggestions(null)}
+ function exportHistory(){let dump={name:'ProcesNavigator',version:'1.0',source:$('fileLabel').textContent,exported:new Date().toISOString(),context:Engine.ctxInfo(),conversation:ui.messages};let blob=new Blob([JSON.stringify(dump,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=el('a');link.href=url;link.download='procesnavigator-gesprek-'+new Date().toISOString().slice(0,10)+'.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),2500)}
+ function start(){$('loadBtn').addEventListener('click',()=>$('fileInput').click());$('fileInput').addEventListener('change',e=>{load(e.target.files?.[0]);e.target.value=''});
+  let drop=$('drop');for(let t of ['dragenter','dragover'])drop.addEventListener(t,e=>{e.preventDefault();e.stopPropagation();drop.classList.add('drag')});for(let t of ['dragleave','drop'])drop.addEventListener(t,e=>{e.preventDefault();e.stopPropagation();drop.classList.remove('drag')});drop.addEventListener('drop',e=>load(e.dataTransfer?.files?.[0]));
+  $('sendBtn').addEventListener('click',()=>send());$('question').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();send()}});
+  $('question').addEventListener('input',e=>{let t=e.target;t.style.height='auto';t.style.height=Math.min(160,t.scrollHeight)+'px'});
+  $('exampleGrid').addEventListener('click',e=>{let b=e.target.closest('[data-q]');if(b)send(b.dataset.q)});
+  $('overviewBtn').addEventListener('click',()=>send('Geef een datasetoverzicht'));$('testBtn').addEventListener('click',openTest);$('exploreBtn').addEventListener('click',()=>openExplore());$('resetBtn').addEventListener('click',clearConversation);$('exportBtn').addEventListener('click',exportHistory);
+  $('closeModal').addEventListener('click',hideModal);$('modalOverlay').addEventListener('click',e=>{if(e.target===$('modalOverlay'))hideModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape')hideModal()});updateContext();updateSuggestions(null)
+ }
+ document.readyState==='loading'?document.addEventListener('DOMContentLoaded',start):start();
+ return {start,load,send,openExplore};
+})();
+
+</script>
+</body></html>
