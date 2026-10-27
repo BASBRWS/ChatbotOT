@@ -36,6 +36,29 @@ Voor algemene verbetering van intentherkenning, matching, contextafhandeling en 
 
 De automatische signalen zijn alleen controles op patronen zoals ontbrekende bronnen, lege resultaten en brede matches. Ze bewijzen niet of een antwoord inhoudelijk juist is.
 
+## Versie 2.3, relationele procesvragen
+
+De vraagrouter gebruikt deterministische patronen voor het combineren van proces, activiteit, actor, handeling, object en bronconditie. Specifieke brongebonden routes ondersteunen:
+
+- Alarmen per proces, gevolgd door de vraag 'En welke stappen?' zonder verlies van de eerdere selectie.
+- Slagboombediening door (c)WVL, met bronactiviteit, procestitel, rol en rechtstreeks gekoppelde conditie. Zonder bewezen actor of conditie wordt dat expliciet vermeld.
+- Videowandimpact via activiteit, systeem en middelenallocatie. Getoonde hoofdprocesgroepen zijn afkomstig uit het Excel procesregister.
+- Indicatieve veiligheidsrelevantie van assets op basis van expliciete veiligheidsactiviteiten. Dit is geen gevalideerde risicorangorde; generieke hulpmiddelen en menselijke rollen worden niet uitsluitend op aantallen bovenaan gezet.
+- Getypte correcties worden als feedback op het vorige antwoord herkend en niet als een nieuwe zoekopdracht. Automatisch toevoegen aan het log werkt alleen als het kwaliteitslog ingeschakeld is.
+- Vervolgvragen over activiteiten, rollen, systemen en processen werken vanuit de eerder geselecteerde bronregels.
+
+## Regressiecontrole
+
+Gebruik Node.js 22 of hoger in de root van de repository:
+
+```bash
+node tests/semantic-regression.test.mjs
+```
+
+De negen controles dekken de acht vragen uit het aangeleverde gesprekslog plus een bestaande functie en een dry-run zonder contextwijziging. De tests draaien op kleine synthetische tabellen. Daarnaast is een browsertest uitgevoerd met een lokaal XLSX testbestand, inclusief feedback en JSON-export.
+
+**Beperking:** De oorspronkelijke werkmap `UPP_processen_volledig_uniform.xlsx` maakt geen deel uit van deze repository. Zonder dat bronbestand kunnen procesinhoud, volledigheid, formele veiligheidsklassificaties en de correcte uitvoeringsmomenten niet onafhankelijk worden gevalideerd.
+
 ## Deployment
 
 `index.html` bevat de hele chatbot, zonder externe JavaScriptbibliotheken. GitHub Actions publiceert nieuwe commits op `main` naar GitHub Pages via `.github/workflows/pages.yml`.
